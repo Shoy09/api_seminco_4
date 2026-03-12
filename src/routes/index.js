@@ -13,7 +13,7 @@ const PlanProduccion = require('../routes/api/planProduccionRoutes');
 const fechasplanmensual = require('../routes/api/fechasPlanMensualroutes');
 const Checklist = require('../routes/api/checklistItemRoutes');
 const tipoEquipoRoutes = require('../routes/api/tipoEquipoRoutes');
-
+const checklistTelemandoRoutes = require('../routes/api/checklistTelemandoRoutes');
 router.use('/usuarios', usuariosRoutes);  
 router.use('/auth', authRoutes);  
 router.use('/Equipo', equipoRoutes);  
@@ -25,5 +25,6 @@ router.use('/PlanProduccion', PlanProduccion);
 router.use('/fechas-plan-mensual', fechasplanmensual)
 router.use('/check-list', Checklist); 
 router.use('/tipo-equipos', tipoEquipoRoutes); 
+router.use('/checklists-telemando', checklistTelemandoRoutes);
 
 module.exports = router;
