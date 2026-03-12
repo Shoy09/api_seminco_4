@@ -31,10 +31,6 @@ const Equipo = sequelize.define('Equipo', {
         type: DataTypes.STRING,
         allowNull: false
     },
-    tipo: {                       // 👈 nuevo campo
-        type: DataTypes.STRING,
-        allowNull: true
-    },
     anioFabricacion: {
         type: DataTypes.INTEGER,
         allowNull: false
