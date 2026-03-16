@@ -14,6 +14,7 @@ const fechasplanmensual = require('../routes/api/fechasPlanMensualroutes');
 const Checklist = require('../routes/api/checklistItemRoutes');
 const tipoEquipoRoutes = require('../routes/api/tipoEquipoRoutes');
 const checklistTelemandoRoutes = require('../routes/api/checklistTelemandoRoutes');
+const seccionRoutes = require('../routes/api/SeccionRuta');
 router.use('/usuarios', usuariosRoutes);  
 router.use('/auth', authRoutes);  
 router.use('/Equipo', equipoRoutes);  
@@ -26,5 +27,6 @@ router.use('/fechas-plan-mensual', fechasplanmensual)
 router.use('/check-list', Checklist); 
 router.use('/tipo-equipos', tipoEquipoRoutes); 
 router.use('/checklists-telemando', checklistTelemandoRoutes);
+router.use('/secciones', seccionRoutes);
 
 module.exports = router;
