@@ -15,7 +15,7 @@ const Checklist = require('../routes/api/checklistItemRoutes');
 const tipoEquipoRoutes = require('../routes/api/tipoEquipoRoutes');
 const checklistTelemandoRoutes = require('../routes/api/checklistTelemandoRoutes');
 const seccionRoutes = require('../routes/api/SeccionRuta');
-const operacionesRoutes = require('../controllers/operaciones');
+const operacionesRoutes = require('../routes/api/operaciones');
 
 router.use('/usuarios', usuariosRoutes);  
 router.use('/auth', authRoutes);  
