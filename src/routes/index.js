@@ -15,6 +15,8 @@ const Checklist = require('../routes/api/checklistItemRoutes');
 const tipoEquipoRoutes = require('../routes/api/tipoEquipoRoutes');
 const checklistTelemandoRoutes = require('../routes/api/checklistTelemandoRoutes');
 const seccionRoutes = require('../routes/api/SeccionRuta');
+const operacionesRoutes = require('../controllers/operaciones');
+
 router.use('/usuarios', usuariosRoutes);  
 router.use('/auth', authRoutes);  
 router.use('/Equipo', equipoRoutes);  
@@ -28,5 +30,6 @@ router.use('/check-list', Checklist);
 router.use('/tipo-equipos', tipoEquipoRoutes); 
 router.use('/checklists-telemando', checklistTelemandoRoutes);
 router.use('/secciones', seccionRoutes);
+router.use('/operaciones', operacionesRoutes);
 
 module.exports = router;
