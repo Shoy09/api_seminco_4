@@ -95,6 +95,56 @@ module.exports = {
   }
 },
 
+// ✅ GET HORÓMETROS (último por cada operación - SECUENCIAL)
+async obtenerUltimosHorometros(req, res) {
+  try {
+
+    const resultado = {};
+
+    for (const [tipo, Modelo] of Object.entries(modelos)) {
+
+      // 🔥 traer SOLO el campo necesario (más ligero)
+      const ultimo = await Modelo.findOne({
+        attributes: ['horometros'],
+        order: [['id', 'DESC']]
+      });
+
+      if (!ultimo) {
+        resultado[tipo] = null;
+        continue;
+      }
+
+      let horometros = ultimo.get('horometros');
+
+      // 🔥 parse seguro
+      if (typeof horometros === 'string') {
+        try {
+          const parsed = JSON.parse(horometros);
+          if (parsed && typeof parsed === 'object') {
+            horometros = parsed;
+          }
+        } catch (_) {
+          // si falla, se queda como string
+        }
+      }
+
+      resultado[tipo] = horometros;
+    }
+
+    res.json({
+      ok: true,
+      data: resultado
+    });
+
+  } catch (error) {
+    console.error('❌ Error en obtenerUltimosHorometros:', error);
+    res.status(500).json({
+      ok: false,
+      error: error.message
+    });
+  }
+},
+
   // ✅ UPDATE (uno o varios)
   async actualizar(req, res) {
     try {
