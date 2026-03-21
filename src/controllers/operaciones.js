@@ -33,29 +33,67 @@ module.exports = {
 
   // ✅ GET (con filtros)
   async obtener(req, res) {
-    try {
-      const { tipo } = req.params;
-      const { estado, envio, limit = 50, offset = 0 } = req.query;
+  try {
+    const { tipo } = req.params;
+    const { estado, envio, limit = 50, offset = 0 } = req.query;
 
-      const Modelo = obtenerModelo(tipo);
+    const Modelo = obtenerModelo(tipo);
 
-      let where = {};
-      if (estado) where.estado = estado;
-      if (envio) where.envio = envio;
+    let where = {};
+    if (estado) where.estado = estado;
+    if (envio) where.envio = envio;
 
-      const data = await Modelo.findAll({
-        where,
-        limit: parseInt(limit),
-        offset: parseInt(offset),
-        order: [['id', 'DESC']]
+    const data = await Modelo.findAll({
+      where,
+      limit: parseInt(limit),
+      offset: parseInt(offset),
+      order: [['id', 'DESC']]
+    });
+
+    /// 🔥 FUNCIÓN SEGURA
+    const parseJSON = (value) => {
+      try {
+        return JSON.parse(value);
+      } catch {
+        return value;
+      }
+    };
+
+    /// 🔥 CAMPOS REALES DEL MODELO
+    const camposModelo = Object.keys(Modelo.rawAttributes);
+
+    const dataFormateada = data.map(item => {
+      const obj = item.toJSON();
+      const resultado = {};
+
+      /// 🔥 SOLO RECORRE CAMPOS REALES
+      camposModelo.forEach(campo => {
+        let valor = obj[campo];
+
+        /// 🔥 SOLO PARSEA SI ES STRING JSON
+        if (typeof valor === 'string') {
+          try {
+            const parsed = JSON.parse(valor);
+
+            /// solo reemplaza si realmente es JSON (array u objeto)
+            if (typeof parsed === 'object') {
+              valor = parsed;
+            }
+          } catch (_) {}
+        }
+
+        resultado[campo] = valor;
       });
 
-      res.json({ ok: true, data });
+      return resultado;
+    });
 
-    } catch (error) {
-      res.status(500).json({ ok: false, error: error.message });
-    }
-  },
+    res.json({ ok: true, data: dataFormateada });
+
+  } catch (error) {
+    res.status(500).json({ ok: false, error: error.message });
+  }
+},
 
   // ✅ UPDATE (uno o varios)
   async actualizar(req, res) {

@@ -20,7 +20,6 @@ module.exports = {
       codigo: {
         type: Sequelize.STRING,
         allowNull: false,
-        unique: true
       },
 
       tipo_estado: {

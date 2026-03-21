@@ -5,6 +5,8 @@ const OperacionCarguio = require('./OperacionCarguio');
 const OperacionRompebanco = require('./OperacionRompebanco');
 const OperacionScissor = require('./OperacionScissor');
 const OperacionAnfochanger = require('./OperacionAnfochanger');
+const OperacionScalamin = require('./OperacionScalamin');
+const OperacionDumper = require('./OperacionDumper');
 
 const modelos = {
   tal_largo: OperacionTalLargo,
@@ -13,7 +15,9 @@ const modelos = {
   carguio: OperacionCarguio,
   rompebanco: OperacionRompebanco,
   scissor: OperacionScissor,
-  anfochanger: OperacionAnfochanger
+  anfochanger: OperacionAnfochanger,
+  scalamin: OperacionScalamin,
+  dumper: OperacionDumper
 };
 
 module.exports = modelos;
