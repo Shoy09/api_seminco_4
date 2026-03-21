@@ -16,6 +16,9 @@ const tipoEquipoRoutes = require('../routes/api/tipoEquipoRoutes');
 const checklistTelemandoRoutes = require('../routes/api/checklistTelemandoRoutes');
 const seccionRoutes = require('../routes/api/SeccionRuta');
 const operacionesRoutes = require('../routes/api/operaciones');
+const longitudBarrasRoutes = require('../routes/api/longitudBarrasRoutes');
+const pernosRoutes = require('../routes/api/pernosRoutes');
+const mallasRoutes = require('../routes/api/mallasRoutes');
 
 router.use('/usuarios', usuariosRoutes);  
 router.use('/auth', authRoutes);  
@@ -31,5 +34,8 @@ router.use('/tipo-equipos', tipoEquipoRoutes);
 router.use('/checklists-telemando', checklistTelemandoRoutes);
 router.use('/secciones', seccionRoutes);
 router.use('/operaciones', operacionesRoutes);
+router.use('/longitud-barras', longitudBarrasRoutes);
+router.use('/pernos', pernosRoutes);
+router.use('/mallas', mallasRoutes);
 
 module.exports = router;
