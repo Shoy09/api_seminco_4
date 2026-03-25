@@ -25,7 +25,7 @@ router.use('/auth', authRoutes);
 router.use('/Equipo', equipoRoutes);  
 router.use('/estado', estadoRoutes);  
 router.use('/TipoPerfpo', TipoPerfpo);  
-router.use('/PlamMensual', PlamMensual);  
+router.use('/PlanMensual', PlamMensual);  
 router.use('/PlanMetraje', PlanMetraje);  
 router.use('/PlanProduccion', PlanProduccion); 
 router.use('/fechas-plan-mensual', fechasplanmensual)
