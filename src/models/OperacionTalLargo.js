@@ -17,7 +17,23 @@ const OperacionTalLargo = sequelize.define('OperacionTalLargo', {
     check_list: DataTypes.TEXT,
     control_llantas: DataTypes.TEXT,
     estado: { type: DataTypes.STRING, defaultValue: 'activo' },
-    envio: { type: DataTypes.INTEGER, defaultValue: 0 }
+    envio: { type: DataTypes.INTEGER, defaultValue: 0 },
+
+    revisado: { 
+        type: DataTypes.INTEGER, 
+        defaultValue: 0 
+    },
+
+    aprobacion: { 
+        type: DataTypes.BOOLEAN, 
+        defaultValue: false 
+    },
+
+    observaciones_jefe: { 
+        type: DataTypes.JSON, 
+        allowNull: true 
+    }
+
 }, {
     tableName: 'Operacion_tal_largo',
     timestamps: false

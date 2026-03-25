@@ -144,6 +144,59 @@ async obtenerUltimosHorometros(req, res) {
     });
   }
 },
+// ✅ GET por jefe_guardia
+async obtenerPorJefe(req, res) {
+  try {
+    const { tipo } = req.params;
+    const { jefe_guardia, limit = 50, offset = 0 } = req.query;
+
+    if (!jefe_guardia) {
+      return res.status(400).json({
+        ok: false,
+        error: 'Debe enviar el jefe_guardia'
+      });
+    }
+
+    const Modelo = obtenerModelo(tipo);
+
+    const data = await Modelo.findAll({
+      where: { jefe_guardia },
+      limit: parseInt(limit),
+      offset: parseInt(offset),
+      order: [['id', 'DESC']]
+    });
+
+    // 🔥 reutilizamos tu lógica de parseo
+    const camposModelo = Object.keys(Modelo.rawAttributes);
+
+    const dataFormateada = data.map(item => {
+      const obj = item.toJSON();
+      const resultado = {};
+
+      camposModelo.forEach(campo => {
+        let valor = obj[campo];
+
+        if (typeof valor === 'string') {
+          try {
+            const parsed = JSON.parse(valor);
+            if (typeof parsed === 'object') {
+              valor = parsed;
+            }
+          } catch (_) {}
+        }
+
+        resultado[campo] = valor;
+      });
+
+      return resultado;
+    });
+
+    res.json({ ok: true, data: dataFormateada });
+
+  } catch (error) {
+    res.status(500).json({ ok: false, error: error.message });
+  }
+},
 
   // ✅ UPDATE (uno o varios)
   async actualizar(req, res) {
