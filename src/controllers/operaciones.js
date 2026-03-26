@@ -198,6 +198,56 @@ async obtenerPorJefe(req, res) {
   }
 },
 
+// ✅ GET por ID (detalle)
+async obtenerPorId(req, res) {
+  try {
+    const { tipo, id } = req.params;
+
+    const Modelo = obtenerModelo(tipo);
+
+    const item = await Modelo.findByPk(id);
+
+    if (!item) {
+      return res.status(404).json({
+        ok: false,
+        error: 'Registro no encontrado'
+      });
+    }
+
+    const obj = item.toJSON();
+
+    // 🔥 parse igual que en los otros métodos
+    const resultado = {};
+    const camposModelo = Object.keys(Modelo.rawAttributes);
+
+    camposModelo.forEach(campo => {
+      let valor = obj[campo];
+
+      if (typeof valor === 'string') {
+        try {
+          const parsed = JSON.parse(valor);
+          if (typeof parsed === 'object') {
+            valor = parsed;
+          }
+        } catch (_) {}
+      }
+
+      resultado[campo] = valor;
+    });
+
+    res.json({
+      ok: true,
+      data: resultado
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      ok: false,
+      error: error.message
+    });
+  }
+},
+
   // ✅ UPDATE (uno o varios)
   async actualizar(req, res) {
     try {
