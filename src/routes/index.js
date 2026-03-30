@@ -19,6 +19,7 @@ const operacionesRoutes = require('../routes/api/operaciones');
 const longitudBarrasRoutes = require('../routes/api/longitudBarrasRoutes');
 const pernosRoutes = require('../routes/api/pernosRoutes');
 const mallasRoutes = require('../routes/api/mallasRoutes');
+const origenDestinoRoutes = require('../routes/api/origenDestinoRoutes');
 
 router.use('/usuarios', usuariosRoutes);  
 router.use('/auth', authRoutes);  
@@ -37,5 +38,6 @@ router.use('/operaciones', operacionesRoutes);
 router.use('/longitud-barras', longitudBarrasRoutes);
 router.use('/pernos', pernosRoutes);
 router.use('/mallas', mallasRoutes);
+router.use('/origen-destino', origenDestinoRoutes);
 
 module.exports = router;
