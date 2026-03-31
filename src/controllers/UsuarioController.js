@@ -120,6 +120,60 @@ exports.crearUsuario = [
     }
 ];
 
+exports.crearUsuariosBulk = [
+  verificarToken,
+  async (req, res) => {
+    try {
+      const usuarios = req.body.usuarios;
+
+      if (!Array.isArray(usuarios) || usuarios.length === 0) {
+        return res.status(400).json({ error: 'No hay usuarios para procesar' });
+      }
+
+      const valores = [];
+
+      for (const u of usuarios) {
+        const {
+          codigo_dni, apellidos, nombres, cargo = null, rol = null,
+          area = null, clasificacion = null, empresa = null,
+          guardia = null, autorizado_equipo = null,
+          correo = null, password, operaciones_autorizadas = {}
+        } = u;
+
+        // hash password
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password, salt);
+
+        const operacionesStr = JSON.stringify(operaciones_autorizadas || {});
+
+        valores.push([
+          codigo_dni, apellidos, nombres, cargo, rol, area,
+          clasificacion, empresa, guardia, autorizado_equipo,
+          correo, hashedPassword, null, operacionesStr
+        ]);
+      }
+
+      await db.query(
+        `INSERT INTO usuarios 
+        (codigo_dni, apellidos, nombres, cargo, rol, area, clasificacion, empresa, guardia, autorizado_equipo, correo, password, firma, operaciones_autorizadas, createdAt, updatedAt) 
+        VALUES ?`,
+        [valores.map(v => [...v, new Date(), new Date()])]
+      );
+
+      res.status(201).json({
+        message: `Se insertaron ${usuarios.length} usuarios`
+      });
+
+    } catch (error) {
+      console.error('❌ Error bulk:', error);
+      res.status(500).json({
+        error: 'Error en carga masiva',
+        details: error.message
+      });
+    }
+  }
+];
+
 
 exports.actualizarUsuario = [
     verificarToken,

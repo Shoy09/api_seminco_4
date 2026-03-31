@@ -12,6 +12,8 @@ router.get('/guardia', usuarioController.obtenerJefesGuardia);
 
 router.post('/usuarios', usuarioController.crearUsuario);
 
+router.post('/usuarios/bulk', usuarioController.crearUsuariosBulk);
+
 router.put('/usuarios/:id/operaciones', usuarioController.actualizarOperacionesAutorizadas);
 
 router.put('/usuarios/:id', usuarioController.actualizarUsuario);
