@@ -249,32 +249,38 @@ async obtenerPorId(req, res) {
 },
 
   // ✅ UPDATE (uno o varios)
-  async actualizar(req, res) {
-    try {
-      const { tipo, data } = req.body;
-      const Modelo = obtenerModelo(tipo);
+ async actualizar(req, res) {
+  try {
+    const { tipo, id } = req.params;
+    const data = req.body;
 
-      let resultado;
+    const Modelo = obtenerModelo(tipo);
 
-      if (Array.isArray(data)) {
-        // múltiples updates
-        const updates = data.map(item =>
-          Modelo.update(item, { where: { id: item.id } })
-        );
-        resultado = await Promise.all(updates);
-      } else {
-        // uno solo
-        const { id, ...rest } = data;
-        resultado = await Modelo.update(rest, {
-          where: { id }
-        });
-      }
+    const [updated] = await Modelo.update(data, {
+      where: { id }
+    });
 
-      res.json({ ok: true, data: resultado });
-
-    } catch (error) {
-      res.status(500).json({ ok: false, error: error.message });
+    if (updated === 0) {
+      return res.status(404).json({
+        ok: false,
+        error: 'Registro no encontrado'
+      });
     }
+
+    // 🔥 devolver el registro actualizado
+    const registroActualizado = await Modelo.findByPk(id);
+
+    res.json({
+      ok: true,
+      data: registroActualizado
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      ok: false,
+      error: error.message
+    });
   }
+}
 
 };

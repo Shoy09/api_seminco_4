@@ -34,6 +34,14 @@ const OperacionCarguio = sequelize.define('OperacionCarguio', {
     observaciones_jefe: { 
         type: DataTypes.JSON, 
         allowNull: true 
+    },
+    observaciones_jefe2: { 
+        type: DataTypes.JSON, 
+        allowNull: true 
+    },
+    observaciones_jefe3: { 
+        type: DataTypes.JSON, 
+        allowNull: true 
     }
 }, {
     tableName: 'Operacion_carguio',

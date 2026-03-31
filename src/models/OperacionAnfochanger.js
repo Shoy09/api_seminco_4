@@ -29,6 +29,14 @@ const OperacionAnfochanger = sequelize.define('OperacionAnfochanger', {
     observaciones_jefe: { 
         type: DataTypes.JSON, 
         allowNull: true 
+    },
+    observaciones_jefe2: { 
+        type: DataTypes.JSON, 
+        allowNull: true 
+    },
+    observaciones_jefe3: { 
+        type: DataTypes.JSON, 
+        allowNull: true 
     }
 }, {
     tableName: 'Operacion_anfochanger',
