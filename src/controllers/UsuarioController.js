@@ -131,37 +131,110 @@ exports.crearUsuariosBulk = [
       }
 
       const valores = [];
+      const errores = [];
+      const dnisProcesados = new Set();
 
-      for (const u of usuarios) {
-        const {
-          codigo_dni, apellidos, nombres, cargo = null, rol = null,
-          area = null, clasificacion = null, empresa = null,
-          guardia = null, autorizado_equipo = null,
-          correo = null, password, operaciones_autorizadas = {}
-        } = u;
+      for (const [index, u] of usuarios.entries()) {
+        try {
+          let {
+            codigo_dni, apellidos, nombres, cargo = null, rol = 'Trabajador',
+            area = null, clasificacion = null, empresa = null,
+            guardia = null, autorizado_equipo = null,
+            correo = null, password, operaciones_autorizadas = {}
+          } = u;
 
-        // hash password
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(password, salt);
+          // 🔧 NORMALIZAR DATOS
+          codigo_dni = String(codigo_dni || '').trim();
+          apellidos = apellidos?.trim();
+          nombres = nombres?.trim();
+          cargo = cargo?.trim() || null;
+          rol = rol?.trim() || 'Trabajador';
+          area = area?.trim() || null;
+          clasificacion = clasificacion?.trim() || null;
+          correo = correo?.trim() || null;
 
-        const operacionesStr = JSON.stringify(operaciones_autorizadas || {});
+          // 🔒 PASSWORD seguro
+          const passwordStr = String(password || '').trim();
 
-        valores.push([
-          codigo_dni, apellidos, nombres, cargo, rol, area,
-          clasificacion, empresa, guardia, autorizado_equipo,
-          correo, hashedPassword, null, operacionesStr
-        ]);
+          // ❌ VALIDACIONES
+          if (!codigo_dni || !apellidos || !nombres || !cargo || !area || !passwordStr) {
+            errores.push({
+              fila: index + 1,
+              dni: codigo_dni || 'Sin DNI',
+              motivo: 'Campos obligatorios incompletos'
+            });
+            continue;
+          }
+
+          // ❌ DNI duplicado en el mismo archivo
+          if (dnisProcesados.has(codigo_dni)) {
+            errores.push({
+              fila: index + 1,
+              dni: codigo_dni,
+              motivo: 'DNI duplicado en el archivo'
+            });
+            continue;
+          }
+
+          dnisProcesados.add(codigo_dni);
+
+          // 🔐 HASH PASSWORD
+          const salt = await bcrypt.genSalt(10);
+          const hashedPassword = await bcrypt.hash(passwordStr, salt);
+
+          // 🔄 OPERACIONES
+          const operacionesStr = JSON.stringify(operaciones_autorizadas || {});
+
+          valores.push([
+            codigo_dni,
+            apellidos,
+            nombres,
+            cargo,
+            rol,
+            area,
+            clasificacion,
+            empresa,
+            guardia,
+            autorizado_equipo,
+            correo,
+            hashedPassword,
+            null, // firma
+            operacionesStr,
+            new Date(),
+            new Date()
+          ]);
+
+        } catch (err) {
+          errores.push({
+            fila: index + 1,
+            dni: u.codigo_dni || 'Sin DNI',
+            motivo: err.message || 'Error procesando usuario'
+          });
+        }
       }
 
+      // ❌ Si no hay válidos
+      if (valores.length === 0) {
+        return res.status(400).json({
+          error: 'No hay usuarios válidos',
+          errores
+        });
+      }
+
+      // 🚀 INSERT MASIVO
       await db.query(
         `INSERT INTO usuarios 
         (codigo_dni, apellidos, nombres, cargo, rol, area, clasificacion, empresa, guardia, autorizado_equipo, correo, password, firma, operaciones_autorizadas, createdAt, updatedAt) 
         VALUES ?`,
-        [valores.map(v => [...v, new Date(), new Date()])]
+        [valores]
       );
 
+      // ✅ RESPUESTA DETALLADA
       res.status(201).json({
-        message: `Se insertaron ${usuarios.length} usuarios`
+        message: 'Carga masiva completada',
+        totalRecibidos: usuarios.length,
+        insertados: valores.length,
+        errores
       });
 
     } catch (error) {
