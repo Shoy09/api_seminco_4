@@ -76,7 +76,22 @@ const seccionController = {
         } catch (error) {
             res.status(500).json({ error: 'Error al eliminar la sección' });
         }
+    },
+
+    getByProceso: async (req, res) => {
+    try {
+        const { proceso } = req.params;
+
+        const secciones = await Seccion.findAll({
+            where: { proceso }
+        });
+
+        res.json(secciones);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error al obtener secciones por proceso' });
     }
+}
 
 };
 

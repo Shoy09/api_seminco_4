@@ -67,7 +67,21 @@ const equipoController = {
         } catch (error) {
             res.status(500).json({ error: 'Error al eliminar el equipo' });
         }
+    },
+    getByProceso: async (req, res) => {
+    try {
+        const { proceso } = req.params;
+
+        const equipos = await Equipo.findAll({
+            where: { proceso }
+        });
+
+        res.json(equipos);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error al obtener equipos por proceso' });
     }
+}
 };
 
 module.exports = equipoController;
