@@ -29,10 +29,10 @@ const OperacionTalLargo = sequelize.define('OperacionTalLargo', {
         defaultValue: false 
     },
 
-    observaciones_jefe: { 
-        type: DataTypes.JSON, 
-        allowNull: true 
-    },
+    aprobacion: { 
+  type: DataTypes.INTEGER, 
+  defaultValue: 0 
+},
     observaciones_jefe2: { 
         type: DataTypes.JSON, 
         allowNull: true 
