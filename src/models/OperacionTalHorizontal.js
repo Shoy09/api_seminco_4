@@ -22,24 +22,24 @@ const OperacionTalHorizontal = sequelize.define('OperacionTalHorizontal', {
         type: DataTypes.INTEGER, 
         defaultValue: 0 
     },
-
-    aprobacion: { 
-        type: DataTypes.BOOLEAN, 
-        defaultValue: false 
-    },
-
+ 
     aprobacion: { 
   type: DataTypes.INTEGER, 
   defaultValue: 0 
 },
-    observaciones_jefe2: { 
-        type: DataTypes.JSON, 
-        allowNull: true 
+   observaciones_jefe: {
+      type: DataTypes.JSON,
+      allowNull: true,
     },
-    observaciones_jefe3: { 
-        type: DataTypes.JSON, 
-        allowNull: true 
-    }
+
+    observaciones_jefe2: {
+      type: DataTypes.JSON,
+      allowNull: true,
+    },
+    observaciones_jefe3: {
+      type: DataTypes.JSON,
+      allowNull: true,
+    },
 }, {
     tableName: 'Operacion_tal_horizontal',
     timestamps: false
