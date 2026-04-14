@@ -20,6 +20,11 @@ const longitudBarrasRoutes = require('../routes/api/longitudBarrasRoutes');
 const pernosRoutes = require('../routes/api/pernosRoutes');
 const mallasRoutes = require('../routes/api/mallasRoutes');
 const origenDestinoRoutes = require('../routes/api/origenDestinoRoutes');
+const Explosivo = require('../routes/api/explosivoRoutes');
+const Accesorio = require('../routes/api/accesorioRoutes');
+const ExploUni = require('../routes/api/explisivosUniRouter');
+const NubeDatosTrabajoExploraciones = require('../routes/api/NubeDatosTrabajoExploracionesRoutes');
+
 
 router.use('/usuarios', usuariosRoutes);  
 router.use('/auth', authRoutes);  
@@ -39,5 +44,9 @@ router.use('/longitud-barras', longitudBarrasRoutes);
 router.use('/pernos', pernosRoutes);
 router.use('/mallas', mallasRoutes);
 router.use('/origen-destino', origenDestinoRoutes);
+router.use('/Accesorios', Accesorio); 
+router.use('/Explo-uni', ExploUni); 
+router.use('/Explosivos', Explosivo);  
+router.use('/NubeDatosExploraciones', NubeDatosTrabajoExploraciones); 
 
 module.exports = router;
