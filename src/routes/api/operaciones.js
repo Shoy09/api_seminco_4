@@ -9,6 +9,7 @@ router.get('/:tipo/id/:id', verificarToken, controller.obtenerPorId);
 router.get('/:tipo/jefe', verificarToken, controller.obtenerPorJefe);
 router.post('/crear', controller.crear);
 router.get('/:tipo', verificarToken, controller.obtener);
+router.get('/aprobacion/:tipo', controller.obtenerPorAprobacion);
 router.put('/update/:tipo/:id', controller.actualizar);
 
 module.exports = router;
