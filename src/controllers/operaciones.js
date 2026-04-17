@@ -33,10 +33,10 @@ module.exports = {
   },
 
   // ✅ GET (con filtros)
-  async obtener(req, res) {
+async obtener(req, res) {
   try {
     const { tipo } = req.params;
-    const { estado, envio, limit = 50, offset = 0 } = req.query;
+    const { estado, envio } = req.query;
 
     const Modelo = obtenerModelo(tipo);
 
@@ -46,37 +46,21 @@ module.exports = {
 
     const data = await Modelo.findAll({
       where,
-      limit: parseInt(limit),
-      offset: parseInt(offset),
       order: [['id', 'DESC']]
     });
 
-    /// 🔥 FUNCIÓN SEGURA
-    const parseJSON = (value) => {
-      try {
-        return JSON.parse(value);
-      } catch {
-        return value;
-      }
-    };
-
-    /// 🔥 CAMPOS REALES DEL MODELO
     const camposModelo = Object.keys(Modelo.rawAttributes);
 
     const dataFormateada = data.map(item => {
       const obj = item.toJSON();
       const resultado = {};
 
-      /// 🔥 SOLO RECORRE CAMPOS REALES
       camposModelo.forEach(campo => {
         let valor = obj[campo];
 
-        /// 🔥 SOLO PARSEA SI ES STRING JSON
         if (typeof valor === 'string') {
           try {
             const parsed = JSON.parse(valor);
-
-            /// solo reemplaza si realmente es JSON (array u objeto)
             if (typeof parsed === 'object') {
               valor = parsed;
             }
@@ -99,7 +83,7 @@ module.exports = {
 async obtenerPorAprobacion(req, res) {
   try {
     const { tipo } = req.params;
-    const { estado, envio, limit = 50, offset = 0 } = req.query;
+    const { estado, envio } = req.query;
 
     const Modelo = obtenerModelo(tipo);
 
@@ -108,26 +92,15 @@ async obtenerPorAprobacion(req, res) {
     if (estado) where.estado = estado;
     if (envio) where.envio = envio;
 
-    /// 🔥 NUEVO FILTRO
+    /// 🔥 FILTRO DE APROBACIÓN
     where.aprobacion = {
       [Op.in]: [0, 1]
     };
 
     const data = await Modelo.findAll({
       where,
-      limit: parseInt(limit),
-      offset: parseInt(offset),
       order: [['id', 'DESC']]
     });
-
-    /// 🔥 FUNCIÓN SEGURA
-    const parseJSON = (value) => {
-      try {
-        return JSON.parse(value);
-      } catch {
-        return value;
-      }
-    };
 
     const camposModelo = Object.keys(Modelo.rawAttributes);
 
