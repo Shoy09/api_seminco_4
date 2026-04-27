@@ -93,3 +93,23 @@ exports.deleteEstado = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+// Obtener estados por proceso
+exports.getEstadosByProceso = async (req, res) => {
+  try {
+    const { proceso } = req.params;
+
+    const [estados] = await db.query(
+      'SELECT * FROM estados WHERE proceso = ?',
+      [proceso]
+    );
+
+    if (estados.length === 0) {
+      return res.status(404).json({ error: 'No se encontraron estados para ese proceso' });
+    }
+
+    res.json(estados);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};

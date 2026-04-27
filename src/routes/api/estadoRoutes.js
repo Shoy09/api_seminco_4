@@ -9,6 +9,6 @@ router.get('/:id', verificarToken, estadoController.getEstadoById);
 router.post('/', verificarToken, estadoController.createEstado);
 router.put('/:id', verificarToken, estadoController.updateEstado);
 router.delete('/:id', verificarToken, estadoController.deleteEstado);
-
+router.get('/proceso/:proceso', verificarToken, estadoController.getEstadosByProceso);
 
 module.exports = router;
