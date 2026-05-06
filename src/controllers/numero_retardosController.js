@@ -13,12 +13,19 @@ const numeroRetardosController = {
 
     create: async (req, res) => {
         try {
-            const { mes, anio, cantidad } = req.body;
+            const { longitud, tipo, codigo } = req.body;
+
+            // Validación básica
+            if (longitud == null || !tipo || !codigo) {
+                return res.status(400).json({
+                    error: 'longitud, tipo y codigo son obligatorios'
+                });
+            }
 
             const registro = await NumeroRetardos.create({
-                mes,
-                anio,
-                cantidad
+                longitud,
+                tipo,
+                codigo
             });
 
             res.status(201).json({
@@ -38,7 +45,7 @@ const numeroRetardosController = {
     update: async (req, res) => {
         try {
             const { id } = req.params;
-            const { mes, anio, cantidad } = req.body;
+            const { longitud, tipo, codigo } = req.body;
 
             const registro = await NumeroRetardos.findByPk(id);
 
@@ -47,9 +54,9 @@ const numeroRetardosController = {
             }
 
             await registro.update({
-                mes,
-                anio,
-                cantidad
+                longitud,
+                tipo,
+                codigo
             });
 
             res.json(registro);
@@ -77,40 +84,6 @@ const numeroRetardosController = {
             res.status(500).json({ error: 'Error al eliminar el registro' });
         }
     },
-
-    getByAnio: async (req, res) => {
-        try {
-            const { anio } = req.params;
-
-            const registros = await NumeroRetardos.findAll({
-                where: { anio }
-            });
-
-            res.json(registros);
-
-        } catch (error) {
-            console.error(error);
-            res.status(500).json({ error: 'Error al obtener registros por año' });
-        }
-    },
-
-    getLast: async (req, res) => {
-    try {
-        const registro = await NumeroRetardos.findOne({
-            order: [['id', 'DESC']]
-        });
-
-        if (!registro) {
-            return res.status(404).json({ error: 'No hay registros' });
-        }
-
-        res.json(registro);
-
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Error al obtener el último registro' });
-    }
-}
 
 };
 
