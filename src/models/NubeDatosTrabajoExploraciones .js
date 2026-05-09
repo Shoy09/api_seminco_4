@@ -97,9 +97,9 @@ const NubeDetalleDespachoExplosivos = sequelize.define('nube_DetalleDespachoExpl
         primaryKey: true,
         autoIncrement: true
     },
-    numero: { type: DataTypes.INTEGER, allowNull: false },
-    ms_cant1: { type: DataTypes.STRING, allowNull: false },
-    lp_cant1: { type: DataTypes.STRING, allowNull: false }
+    longitud: { type: DataTypes.FLOAT, allowNull: false },
+    tipo: { type: DataTypes.STRING, allowNull: false }, // "Milisegundo" o "Medio Segundo"
+    retardos: { type: DataTypes.JSON, allowNull: false } // JSON array con {numero, codigo, cantidad}
 }, {
     tableName: 'nube_detalle_despacho_explosivos',
     timestamps: true,
@@ -112,9 +112,9 @@ const NubeDetalleDevolucionesExplosivos = sequelize.define('nube_DetalleDevoluci
         primaryKey: true,
         autoIncrement: true
     },
-    numero: { type: DataTypes.INTEGER, allowNull: false },
-    ms_cant1: { type: DataTypes.STRING, allowNull: false },
-    lp_cant1: { type: DataTypes.STRING, allowNull: false }
+    longitud: { type: DataTypes.FLOAT, allowNull: false },
+    tipo: { type: DataTypes.STRING, allowNull: false }, // "Milisegundo" o "Medio Segundo"
+    retardos: { type: DataTypes.JSON, allowNull: false } // JSON array con {numero, codigo, cantidad}
 }, {
     tableName: 'nube_detalle_devoluciones_explosivos',
     timestamps: true,
