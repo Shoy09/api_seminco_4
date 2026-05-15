@@ -7,6 +7,11 @@ const Accesorio = sequelize.define('Accesorio', {
         primaryKey: true,
         autoIncrement: true
     },
+    codigo: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: true
+    },
     tipo_accesorio: {
         type: DataTypes.STRING,
         allowNull: false

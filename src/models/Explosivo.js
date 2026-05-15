@@ -7,6 +7,11 @@ const Explosivo = sequelize.define('Explosivo', {
         primaryKey: true,
         autoIncrement: true
     },
+    codigo: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: true
+    },
     tipo_explosivo: {
         type: DataTypes.STRING,
         allowNull: false
