@@ -253,45 +253,134 @@ exports.actualizarUsuario = [
     upload.single('firma'),
     async (req, res) => {
         const { id } = req.params;
+
         const {
-            codigo_dni, apellidos, nombres, cargo, empresa, rol,
-            guardia, autorizado_equipo, correo, password, operaciones_autorizadas
+            codigo_dni,
+            apellidos,
+            nombres,
+            cargo,
+            empresa,
+            rol,
+            guardia,
+            autorizado_equipo,
+            correo,
+            password,
+            operaciones_autorizadas
         } = req.body;
 
-        const firma = req.file ? req.file.path : null;
+        const nuevaFirma = req.file ? req.file.path : null;
 
         try {
-            const [rows] = await db.query('SELECT * FROM usuarios WHERE id = ?', [id]);
-            if (rows.length === 0) return res.status(404).json({ error: 'Usuario no encontrado' });
+            const [rows] = await db.query(
+                'SELECT * FROM usuarios WHERE id = ?',
+                [id]
+            );
 
-            if (rol && !['admin', 'user', 'supervisor'].includes(rol)) {
-                return res.status(400).json({ error: 'Rol no válido. Los valores permitidos son: admin, user, supervisor' });
+            if (rows.length === 0) {
+                return res.status(404).json({
+                    error: 'Usuario no encontrado'
+                });
             }
 
-            let query = `UPDATE usuarios SET codigo_dni = ?, apellidos = ?, nombres = ?, cargo = ?, rol = ?, empresa = ?, guardia = ?, autorizado_equipo = ?, correo = ?, updatedAt = NOW()`;
-            const queryParams = [codigo_dni, apellidos, nombres, cargo, rol, empresa, guardia, autorizado_equipo, correo];
+            const usuarioActual = rows[0];
 
-            if (firma) {
-                if (rows[0].firma) {
-                    const firmaUrl = rows[0].firma;
-                    const publicId = firmaUrl.split('/').pop().split('.')[0];
-                    await cloudinary.uploader.destroy(`firmas/${publicId}`);
+            // Validar correo duplicado
+            if (correo) {
+                const [correoExistente] = await db.query(
+                    'SELECT id FROM usuarios WHERE correo = ? AND id <> ?',
+                    [correo, id]
+                );
+
+                if (correoExistente.length > 0) {
+                    return res.status(400).json({
+                        error: 'El correo ya está en uso'
+                    });
+                }
+            }
+
+            let query = `
+                UPDATE usuarios SET
+                    codigo_dni = ?,
+                    apellidos = ?,
+                    nombres = ?,
+                    cargo = ?,
+                    rol = ?,
+                    empresa = ?,
+                    guardia = ?,
+                    autorizado_equipo = ?,
+                    correo = ?,
+                    updatedAt = NOW()
+            `;
+
+            const queryParams = [
+                codigo_dni,
+                apellidos,
+                nombres,
+                cargo,
+                rol,
+                empresa,
+                guardia,
+                autorizado_equipo,
+                correo
+            ];
+
+            // Firma
+            if (nuevaFirma) {
+                try {
+                    if (usuarioActual.firma) {
+                        const firmaUrl = usuarioActual.firma;
+                        const publicId = firmaUrl
+                            .split('/')
+                            .pop()
+                            .split('.')[0];
+
+                        await cloudinary.uploader.destroy(
+                            `firmas/${publicId}`
+                        );
+                    }
+                } catch (errorFirma) {
+                    console.warn(
+                        'No se pudo eliminar la firma anterior:',
+                        errorFirma.message
+                    );
                 }
 
                 query += `, firma = ?`;
-                queryParams.push(firma);
+                queryParams.push(nuevaFirma);
             }
 
-            if (password) {
+            // Password
+            if (
+                password &&
+                typeof password === 'string' &&
+                password.trim() !== ''
+            ) {
                 const salt = await bcrypt.genSalt(10);
-                const hashedPassword = await bcrypt.hash(password, salt);
+                const hashedPassword = await bcrypt.hash(
+                    password.trim(),
+                    salt
+                );
+
                 query += `, password = ?`;
                 queryParams.push(hashedPassword);
             }
 
-            if (operaciones_autorizadas) {
+            // Operaciones autorizadas
+            if (operaciones_autorizadas !== undefined) {
+                let operacionesStr;
+
+                if (typeof operaciones_autorizadas === 'string') {
+                    operacionesStr = JSON.stringify(
+                        JSON.parse(operaciones_autorizadas)
+                    );
+                } else {
+                    operacionesStr = JSON.stringify(
+                        operaciones_autorizadas
+                    );
+                }
+
                 query += `, operaciones_autorizadas = ?`;
-                queryParams.push(JSON.stringify(JSON.parse(operaciones_autorizadas)));
+                queryParams.push(operacionesStr);
             }
 
             query += ` WHERE id = ?`;
@@ -299,10 +388,21 @@ exports.actualizarUsuario = [
 
             await db.query(query, queryParams);
 
-            res.status(200).json({ message: 'Usuario actualizado exitosamente', firma });
+            res.status(200).json({
+                message: 'Usuario actualizado exitosamente',
+                firma: nuevaFirma || usuarioActual.firma
+            });
+
         } catch (error) {
-            console.error('Error al actualizar el usuario:', error.message);
-            res.status(500).json({ error: 'Error al actualizar el usuario' });
+            console.error(
+                'Error al actualizar usuario:',
+                error
+            );
+
+            res.status(500).json({
+                error: 'Error al actualizar el usuario',
+                details: error.message
+            });
         }
     }
 ];
