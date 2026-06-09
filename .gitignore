@@ -17,8 +17,12 @@ yarn-error.log
 
 dist/
 build/
+dotnet/**/bin/
+dotnet/**/obj/
 
 package-lock.json
 yarn.lock
 
 test-data/
+
+AGENTS.md
