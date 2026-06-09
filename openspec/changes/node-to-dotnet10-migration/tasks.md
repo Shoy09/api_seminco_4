@@ -34,7 +34,7 @@ Chain strategy: stacked-to-main
 
 ## Phase 2: Auth, Users, First Catalog
 
-- [ ] 2.1 Implement `dotnet/src/Seminco.Api/Controllers/AuthController.cs`, `dotnet/src/Seminco.Application/Auth/*`, and `dotnet/src/Seminco.Infrastructure/Auth/*` for `POST /api/auth/login` with bcrypt and three-hour JWT.
+- [x] 2.1 Implement `dotnet/src/Seminco.Api/Controllers/AuthController.cs`, `dotnet/src/Seminco.Application/Auth/*`, and `dotnet/src/Seminco.Infrastructure/Auth/*` for `POST /api/auth/login` with bcrypt and three-hour JWT.
 - [ ] 2.2 Implement `dotnet/src/Seminco.Api/Controllers/UsuariosController.cs`, `dotnet/src/Seminco.Application/Users/*`, and `dotnet/src/Seminco.Infrastructure/Users/*` for `/api/usuarios/perfil` and signature URL persistence.
 - [ ] 2.3 Implement `dotnet/src/Seminco.Api/Controllers/TipoEquiposController.cs`, `dotnet/src/Seminco.Application/Catalogs/*`, and `dotnet/src/Seminco.Infrastructure/Catalogs/*` as the protected CRUD pattern.
 
