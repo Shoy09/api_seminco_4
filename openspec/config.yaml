@@ -1,0 +1,86 @@
+schema: spec-driven
+project: api_seminco_4
+artifact_store:
+  mode: openspec
+
+context: |
+  Tech stack: Node.js CommonJS Express 4 API, Swagger UI/autogen, Vercel @vercel/node deployment.
+  Architecture: src/app.js mounts src/routes/index.js; route modules call controllers; controllers use raw mysql2 and Sequelize models.
+  Persistence: MySQL via mysql2 pool and Sequelize 6 ORM; Sequelize CLI migrations live in migrations/.
+  Auth/uploads: JWT middleware uses JWT_SECRET; file uploads use Cloudinary with multer-storage-cloudinary.
+  Style: Spanish identifiers, comments, route names, and API messages; generated Swagger JSON should be regenerated from route/source annotations.
+  Testing: no configured test runner, coverage, linter, type checker, formatter, or CI detected in repository files.
+
+strict_tdd: false
+
+testing:
+  detected_at: 2026-06-09
+  strict_tdd:
+    enabled: false
+    reason: "No test runner or strict TDD marker/config was detected."
+  test_runner:
+    available: false
+    framework: null
+    command: null
+  test_layers:
+    unit:
+      available: false
+      tool: null
+    integration:
+      available: false
+      tool: null
+    e2e:
+      available: false
+      tool: null
+  coverage:
+    available: false
+    command: null
+  quality_tools:
+    linter:
+      available: false
+      command: null
+    type_checker:
+      available: false
+      command: null
+    formatter:
+      available: false
+      command: null
+
+commands:
+  dev: "npm run dev"
+  start: "npm start"
+  swagger: "node swagger.js"
+  migrate: "npx sequelize-cli db:migrate"
+  test: null
+  build: null
+
+rules:
+  proposal:
+    - "Keep proposals aligned with the existing Express route/controller/model structure."
+    - "Include rollback plans for database, auth, upload, and deployment changes."
+  specs:
+    - "Use RFC 2119 keywords (MUST, SHALL, SHOULD, MAY)."
+    - "Use Given/When/Then scenarios."
+    - "Name API behavior in domain language used by the existing Spanish codebase."
+  design:
+    - "Document whether changes touch raw mysql2 controllers, Sequelize models, or both."
+    - "Document migration impact when schema, model, or persisted payload behavior changes."
+    - "Include auth and upload boundary decisions when relevant."
+  tasks:
+    - "Group work by reviewable phases and keep each task completable in one session."
+    - "Respect the 400-line review budget; ask before using chained PR strategy."
+  apply:
+    tdd: false
+    test_command: ""
+    guidelines:
+      - "Follow existing CommonJS and Spanish codebase conventions."
+      - "Do not hand-edit swagger.json; update source annotations and run node swagger.js when Swagger output must change."
+  verify:
+    test_command: ""
+    build_command: ""
+    coverage_threshold: 0
+    guidelines:
+      - "When no automated tests exist for a change, verify with targeted static review and documented manual/API checks."
+  archive:
+    - "Warn before merging destructive delta specs or schema changes."
+    - "Preserve archived change folders as an audit trail."
