@@ -4,6 +4,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Seminco.Infrastructure.Configuration;
 using Seminco.Infrastructure.Persistence;
+using Seminco.Application.Auth;
+using Seminco.Application.Users;
+using Seminco.Infrastructure.Auth;
+using Seminco.Infrastructure.Users;
 
 namespace Seminco.Infrastructure;
 
@@ -32,6 +36,13 @@ public static class DependencyInjection
             var database = provider.GetRequiredService<IOptions<DatabaseOptions>>().Value;
             options.UseNpgsql(database.ToConnectionString());
         });
+
+        services.AddScoped<LoginService>();
+        services.AddScoped<UserProfileService>();
+        services.AddScoped<IUserAuthRepository, UserRepository>();
+        services.AddScoped<IUserProfileRepository, UserRepository>();
+        services.AddSingleton<IPasswordVerifier, BCryptPasswordVerifier>();
+        services.AddSingleton<IJwtTokenIssuer, JwtTokenIssuer>();
 
         return services;
     }
