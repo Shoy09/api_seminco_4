@@ -8,11 +8,13 @@ using Seminco.Infrastructure.Catalogs.Services;
 using Seminco.Application.Auth;
 using Seminco.Application.Catalogs;
 using Seminco.Application.Exploraciones;
+using Seminco.Application.Mediciones;
 using Seminco.Application.Operaciones;
 using Seminco.Application.Planes;
 using Seminco.Application.Users;
 using Seminco.Infrastructure.Auth;
 using Seminco.Infrastructure.Operaciones;
+using Seminco.Infrastructure.Mediciones;
 using Seminco.Infrastructure.Exploraciones;
 using Seminco.Infrastructure.Planes;
 using Seminco.Infrastructure.Users;
@@ -54,6 +56,7 @@ public static class DependencyInjection
         services.AddSingleton<IJwtTokenIssuer, JwtTokenIssuer>();
         services.AddScoped<IOperacionService, OperacionService>();
         services.AddScoped<INubeExploracionService, NubeExploracionService>();
+        services.AddScoped<IMedicionHorizontalService, MedicionHorizontalService>();
 
         RegisterCatalogServices(services);
         RegisterPlanServices(services);

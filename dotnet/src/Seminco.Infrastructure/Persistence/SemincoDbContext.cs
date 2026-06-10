@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Seminco.Domain.Catalogs;
 using Seminco.Domain.Exploraciones;
+using Seminco.Domain.Mediciones;
 using Seminco.Domain.Operaciones;
 using Seminco.Domain.Planes;
 using Seminco.Domain.Users;
@@ -46,6 +47,7 @@ public sealed class SemincoDbContext(DbContextOptions<SemincoDbContext> options)
     public DbSet<NubeDevolucion> NubeDevoluciones => Set<NubeDevolucion>();
     public DbSet<NubeDevolucionDetalle> NubeDevolucionDetalles => Set<NubeDevolucionDetalle>();
     public DbSet<NubeDetalleDevolucionExplosivo> NubeDetalleDevolucionExplosivos => Set<NubeDetalleDevolucionExplosivo>();
+    public DbSet<MedicionHorizontal> MedicionesHorizontal => Set<MedicionHorizontal>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -233,6 +235,34 @@ public sealed class SemincoDbContext(DbContextOptions<SemincoDbContext> options)
         ConfigureOperaciones(modelBuilder);
         ConfigurePlanes(modelBuilder);
         ConfigureExploraciones(modelBuilder);
+        ConfigureMediciones(modelBuilder);
+    }
+
+    private static void ConfigureMediciones(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<MedicionHorizontal>(e =>
+        {
+            e.ToTable("mediciones_horizontal");
+            e.HasKey(x => x.Id);
+            e.Property(x => x.Id).HasColumnName("id").ValueGeneratedOnAdd();
+            e.Property(x => x.Fecha).HasColumnName("fecha");
+            e.Property(x => x.Turno).HasColumnName("turno");
+            e.Property(x => x.Empresa).HasColumnName("empresa");
+            e.Property(x => x.Zona).HasColumnName("zona");
+            e.Property(x => x.Labor).HasColumnName("labor");
+            e.Property(x => x.Veta).HasColumnName("veta");
+            e.Property(x => x.TipoPerforacion).HasColumnName("tipo_perforacion");
+            e.Property(x => x.KgExplosivos).HasColumnName("kg_explosivos");
+            e.Property(x => x.AvanceProgramado).HasColumnName("avance_programado");
+            e.Property(x => x.Ancho).HasColumnName("ancho");
+            e.Property(x => x.Alto).HasColumnName("alto");
+            e.Property(x => x.Envio).HasColumnName("envio").HasDefaultValue(0);
+            e.Property(x => x.IdExplosivo).HasColumnName("id_explosivo");
+            e.Property(x => x.IdNube).HasColumnName("idnube");
+            e.Property(x => x.NoAplica).HasColumnName("no_aplica").HasDefaultValue(0);
+            e.Property(x => x.Remanente).HasColumnName("remanente").HasDefaultValue(0);
+            e.HasIndex(x => x.IdNube).IsUnique();
+        });
     }
 
     private static void ConfigureExploraciones(ModelBuilder modelBuilder)
