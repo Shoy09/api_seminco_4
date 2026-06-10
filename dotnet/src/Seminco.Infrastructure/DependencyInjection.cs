@@ -4,7 +4,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Seminco.Infrastructure.Configuration;
 using Seminco.Infrastructure.Persistence;
+using Seminco.Infrastructure.Catalogs.Services;
 using Seminco.Application.Auth;
+using Seminco.Application.Catalogs;
 using Seminco.Application.Users;
 using Seminco.Infrastructure.Auth;
 using Seminco.Infrastructure.Users;
@@ -45,7 +47,28 @@ public static class DependencyInjection
         services.AddSingleton<IPasswordVerifier, BCryptPasswordVerifier>();
         services.AddSingleton<IJwtTokenIssuer, JwtTokenIssuer>();
 
+        RegisterCatalogServices(services);
+
         return services;
+    }
+
+    private static void RegisterCatalogServices(IServiceCollection services)
+    {
+        services.AddScoped<ICatalogService<EquipoDto>, EquipoService>();
+        services.AddScoped<ICatalogService<EstadoDto>, EstadoService>();
+        services.AddScoped<ICatalogService<TipoPerforacionDto>, TipoPerforacionService>();
+        services.AddScoped<ICatalogService<TipoEquipoDto>, TipoEquipoService>();
+        services.AddScoped<ICatalogService<CheckListItemDto>, CheckListItemService>();
+        services.AddScoped<ICatalogService<ChecklistTelemandoDto>, ChecklistTelemandoService>();
+        services.AddScoped<ICatalogService<SeccionDto>, SeccionService>();
+        services.AddScoped<ICatalogService<LongitudBarraDto>, LongitudBarraService>();
+        services.AddScoped<ICatalogService<PernoDto>, PernoService>();
+        services.AddScoped<ICatalogService<MallaDto>, MallaService>();
+        services.AddScoped<ICatalogService<OrigenDestinoDto>, OrigenDestinoService>();
+        services.AddScoped<ICatalogService<AccesorioDto>, AccesorioService>();
+        services.AddScoped<ICatalogService<ExplosivoDto>, ExplosivoService>();
+        services.AddScoped<ICatalogService<ExplosivoUniDto>, ExplosivoUniService>();
+        services.AddScoped<ICatalogService<NumeroRetardoDto>, NumeroRetardoService>();
     }
 
     private static void Copy(DatabaseOptions source, DatabaseOptions target) =>
