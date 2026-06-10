@@ -8,9 +8,11 @@ using Seminco.Infrastructure.Catalogs.Services;
 using Seminco.Application.Auth;
 using Seminco.Application.Catalogs;
 using Seminco.Application.Operaciones;
+using Seminco.Application.Planes;
 using Seminco.Application.Users;
 using Seminco.Infrastructure.Auth;
 using Seminco.Infrastructure.Operaciones;
+using Seminco.Infrastructure.Planes;
 using Seminco.Infrastructure.Users;
 
 namespace Seminco.Infrastructure;
@@ -51,8 +53,16 @@ public static class DependencyInjection
         services.AddScoped<IOperacionService, OperacionService>();
 
         RegisterCatalogServices(services);
+        RegisterPlanServices(services);
 
         return services;
+    }
+
+    private static void RegisterPlanServices(IServiceCollection services)
+    {
+        services.AddScoped<IPlanService<PlanMensualDto>, PlanMensualService>();
+        services.AddScoped<IPlanService<PlanMetrajeDto>, PlanMetrajeService>();
+        services.AddScoped<IPlanService<PlanProduccionDto>, PlanProduccionService>();
     }
 
     private static void RegisterCatalogServices(IServiceCollection services)

@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Seminco.Domain.Catalogs;
 using Seminco.Domain.Operaciones;
+using Seminco.Domain.Planes;
 using Seminco.Domain.Users;
 
 namespace Seminco.Infrastructure.Persistence;
@@ -33,6 +34,9 @@ public sealed class SemincoDbContext(DbContextOptions<SemincoDbContext> options)
     public DbSet<OperacionAnfochanger> OperacionesAnfochanger => Set<OperacionAnfochanger>();
     public DbSet<OperacionScalamin> OperacionesScalamin => Set<OperacionScalamin>();
     public DbSet<OperacionDumper> OperacionesDumper => Set<OperacionDumper>();
+    public DbSet<PlanMensual> PlanesMensuales => Set<PlanMensual>();
+    public DbSet<PlanMetraje> PlanesMetraje => Set<PlanMetraje>();
+    public DbSet<PlanProduccion> PlanesProduccion => Set<PlanProduccion>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -218,6 +222,39 @@ public sealed class SemincoDbContext(DbContextOptions<SemincoDbContext> options)
         });
 
         ConfigureOperaciones(modelBuilder);
+        ConfigurePlanes(modelBuilder);
+    }
+
+    private static void ConfigurePlanes(ModelBuilder modelBuilder)
+    {
+        void Base<T>(EntityTypeBuilder<T> e, string colPrefix) where T : PlanBase
+        {
+            e.HasKey(p => p.Id);
+            e.Property(p => p.Id).HasColumnName("id").ValueGeneratedOnAdd();
+            e.Property(p => p.Anio).HasColumnName("anio");
+            e.Property(p => p.Mes).HasColumnName("mes");
+            e.Property(p => p.Programado).HasColumnName("programado");
+            e.Property(p => p.CreatedAt).HasColumnName("createdAt");
+            e.Property(p => p.UpdatedAt).HasColumnName("updatedAt");
+            for (var d = 1; d <= 28; d++)
+            {
+                e.Property<string?>($"Col{d}A").HasColumnName($"{colPrefix}{d}A");
+                e.Property<string?>($"Col{d}B").HasColumnName($"{colPrefix}{d}B");
+            }
+        }
+
+        void Map<T>(string table, string colPrefix) where T : PlanBase
+        {
+            modelBuilder.Entity<T>(e =>
+            {
+                e.ToTable(table);
+                Base(e, colPrefix);
+            });
+        }
+
+        Map<PlanMensual>("plan_mensual", "col_");
+        Map<PlanMetraje>("planmetraje", "columna_");
+        Map<PlanProduccion>("planproduccions", "columna_");
     }
 
     private static void ConfigureOperaciones(ModelBuilder modelBuilder)
