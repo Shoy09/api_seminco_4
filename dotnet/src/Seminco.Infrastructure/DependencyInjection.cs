@@ -63,6 +63,7 @@ public static class DependencyInjection
         services.AddScoped<IPlanService<PlanMensualDto>, PlanMensualService>();
         services.AddScoped<IPlanService<PlanMetrajeDto>, PlanMetrajeService>();
         services.AddScoped<IPlanService<PlanProduccionDto>, PlanProduccionService>();
+        services.AddScoped<IFechaPlanMensualService, FechaPlanMensualService>();
     }
 
     private static void RegisterCatalogServices(IServiceCollection services)

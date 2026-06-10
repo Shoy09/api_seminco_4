@@ -37,6 +37,7 @@ public sealed class SemincoDbContext(DbContextOptions<SemincoDbContext> options)
     public DbSet<PlanMensual> PlanesMensuales => Set<PlanMensual>();
     public DbSet<PlanMetraje> PlanesMetraje => Set<PlanMetraje>();
     public DbSet<PlanProduccion> PlanesProduccion => Set<PlanProduccion>();
+    public DbSet<FechaPlanMensual> FechasPlanMensual => Set<FechaPlanMensual>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -255,6 +256,15 @@ public sealed class SemincoDbContext(DbContextOptions<SemincoDbContext> options)
         Map<PlanMensual>("plan_mensual", "col_");
         Map<PlanMetraje>("planmetraje", "columna_");
         Map<PlanProduccion>("planproduccions", "columna_");
+
+        modelBuilder.Entity<FechaPlanMensual>(e =>
+        {
+            e.ToTable("fechas_plan_mensual");
+            e.HasKey(f => f.Id);
+            e.Property(f => f.Id).HasColumnName("id").ValueGeneratedOnAdd();
+            e.Property(f => f.Mes).HasColumnName("mes");
+            e.Property(f => f.FechaIngreso).HasColumnName("fecha_ingreso");
+        });
     }
 
     private static void ConfigureOperaciones(ModelBuilder modelBuilder)
