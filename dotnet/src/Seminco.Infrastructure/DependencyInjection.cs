@@ -7,8 +7,10 @@ using Seminco.Infrastructure.Persistence;
 using Seminco.Infrastructure.Catalogs.Services;
 using Seminco.Application.Auth;
 using Seminco.Application.Catalogs;
+using Seminco.Application.Operaciones;
 using Seminco.Application.Users;
 using Seminco.Infrastructure.Auth;
+using Seminco.Infrastructure.Operaciones;
 using Seminco.Infrastructure.Users;
 
 namespace Seminco.Infrastructure;
@@ -46,6 +48,7 @@ public static class DependencyInjection
         services.AddScoped<IUserProfileRepository, UserRepository>();
         services.AddSingleton<IPasswordVerifier, BCryptPasswordVerifier>();
         services.AddSingleton<IJwtTokenIssuer, JwtTokenIssuer>();
+        services.AddScoped<IOperacionService, OperacionService>();
 
         RegisterCatalogServices(services);
 
