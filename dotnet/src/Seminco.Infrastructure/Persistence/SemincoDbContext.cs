@@ -421,40 +421,121 @@ public sealed class SemincoDbContext(DbContextOptions<SemincoDbContext> options)
 
     private static void ConfigureOperaciones(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<OperacionBase>(entity => entity.UseTpcMappingStrategy());
-
-        void Base<T>(EntityTypeBuilder<T> e) where T : OperacionBase
+        modelBuilder.Entity<OperacionBase>(entity =>
         {
-            e.HasKey(op => op.Id);
-            e.Property(op => op.Id).HasColumnName("id").ValueGeneratedOnAdd();
-            e.Property(op => op.Fecha).HasColumnName("fecha");
-            e.Property(op => op.Turno).HasColumnName("turno");
-            e.Property(op => op.Operador).HasColumnName("operador");
-            e.Property(op => op.JefeGuardia).HasColumnName("jefe_guardia");
-            e.Property(op => op.Equipo).HasColumnName("equipo");
-            e.Property(op => op.NEquipo).HasColumnName("n_equipo");
-            e.Property(op => op.Registros).HasColumnName("registros");
-            e.Property(op => op.Horometros).HasColumnName("horometros");
-            e.Property(op => op.CondicionesEquipo).HasColumnName("condiciones_equipo");
-            e.Property(op => op.CheckList).HasColumnName("check_list");
-            e.Property(op => op.ControlLlantas).HasColumnName("control_llantas");
-            e.Property(op => op.Estado).HasColumnName("estado").HasDefaultValue("activo");
-            e.Property(op => op.Envio).HasColumnName("envio").HasDefaultValue(0);
-            e.Property(op => op.Revisado).HasColumnName("revisado").HasDefaultValue(0);
-            e.Property(op => op.Aprobacion).HasColumnName("aprobacion").HasDefaultValue(0);
-            e.Property(op => op.ObservacionesJefe).HasColumnName("observaciones_jefe");
-            e.Property(op => op.ObservacionesJefe2).HasColumnName("observaciones_jefe2");
-            e.Property(op => op.ObservacionesJefe3).HasColumnName("observaciones_jefe3");
-        }
+            entity.UseTpcMappingStrategy();
 
-        modelBuilder.Entity<OperacionTalLargo>(e => { Base<OperacionTalLargo>(e); e.ToTable("Operacion_tal_largo"); e.Property(op => op.Seccion).HasColumnName("seccion"); e.Property(op => op.ModeloEquipo).HasColumnName("modelo_equipo"); });
-        modelBuilder.Entity<OperacionTalHorizontal>(e => { Base<OperacionTalHorizontal>(e); e.ToTable("Operacion_tal_horizontal"); e.Property(op => op.Seccion).HasColumnName("seccion"); e.Property(op => op.ModeloEquipo).HasColumnName("modelo_equipo"); });
-        modelBuilder.Entity<OperacionEmpernador>(e => { Base<OperacionEmpernador>(e); e.ToTable("Operacion_empernador"); e.Property(op => op.Seccion).HasColumnName("seccion"); e.Property(op => op.TipoEquipo).HasColumnName("tipo_equipo"); });
-        modelBuilder.Entity<OperacionCarguio>(e => { Base<OperacionCarguio>(e); e.ToTable("Operacion_carguio"); e.Property(op => op.Seccion).HasColumnName("seccion"); e.Property(op => op.Capacidad).HasColumnName("capacidad"); e.Property(op => op.TipoEquipo).HasColumnName("tipo_equipo"); e.Property(op => op.ProgramaTrabajo).HasColumnName("programa_trabajo"); });
-        modelBuilder.Entity<OperacionRompebanco>(e => { Base<OperacionRompebanco>(e); e.ToTable("Operacion_rompebanco"); });
-        modelBuilder.Entity<OperacionScissor>(e => { Base<OperacionScissor>(e); e.ToTable("Operacion_scissor"); e.Property(op => op.Seccion).HasColumnName("seccion"); e.Property(op => op.ModeloEquipo).HasColumnName("modelo_equipo"); });
-        modelBuilder.Entity<OperacionAnfochanger>(e => { Base<OperacionAnfochanger>(e); e.ToTable("Operacion_anfochanger"); e.Property(op => op.Seccion).HasColumnName("seccion"); e.Property(op => op.ModeloEquipo).HasColumnName("modelo_equipo"); });
-        modelBuilder.Entity<OperacionScalamin>(e => { Base<OperacionScalamin>(e); e.ToTable("Operacion_scalamin"); e.Property(op => op.Seccion).HasColumnName("seccion"); e.Property(op => op.ModeloEquipo).HasColumnName("modelo_equipo"); });
-        modelBuilder.Entity<OperacionDumper>(e => { Base<OperacionDumper>(e); e.ToTable("Operacion_dumper"); e.Property(op => op.Seccion).HasColumnName("seccion"); e.Property(op => op.Capacidad).HasColumnName("capacidad"); e.Property(op => op.TipoEquipo).HasColumnName("tipo_equipo"); e.Property(op => op.ProgramaTrabajo).HasColumnName("programa_trabajo"); e.Property(op => op.CheckListTelemando).HasColumnName("check_list_telemando"); });
+            entity.HasKey(op => op.Id);
+
+            entity.Property(op => op.Id)
+                .HasColumnName("id")
+                .ValueGeneratedOnAdd();
+
+            entity.Property(op => op.Fecha).HasColumnName("fecha");
+            entity.Property(op => op.Turno).HasColumnName("turno");
+            entity.Property(op => op.Operador).HasColumnName("operador");
+            entity.Property(op => op.JefeGuardia).HasColumnName("jefe_guardia");
+            entity.Property(op => op.Equipo).HasColumnName("equipo");
+            entity.Property(op => op.NEquipo).HasColumnName("n_equipo");
+            entity.Property(op => op.Registros).HasColumnName("registros");
+            entity.Property(op => op.Horometros).HasColumnName("horometros");
+            entity.Property(op => op.CondicionesEquipo).HasColumnName("condiciones_equipo");
+            entity.Property(op => op.CheckList).HasColumnName("check_list");
+            entity.Property(op => op.ControlLlantas).HasColumnName("control_llantas");
+
+            entity.Property(op => op.Estado)
+                .HasColumnName("estado")
+                .HasDefaultValue("activo");
+
+            entity.Property(op => op.Envio)
+                .HasColumnName("envio")
+                .HasDefaultValue(0);
+
+            entity.Property(op => op.Revisado)
+                .HasColumnName("revisado")
+                .HasDefaultValue(0);
+
+            entity.Property(op => op.Aprobacion)
+                .HasColumnName("aprobacion")
+                .HasDefaultValue(0);
+
+            entity.Property(op => op.ObservacionesJefe).HasColumnName("observaciones_jefe");
+            entity.Property(op => op.ObservacionesJefe2).HasColumnName("observaciones_jefe2");
+            entity.Property(op => op.ObservacionesJefe3).HasColumnName("observaciones_jefe3");
+        });
+
+        modelBuilder.Entity<OperacionTalLargo>(e =>
+        {
+            e.ToTable("Operacion_tal_largo");
+
+            e.Property(op => op.Seccion).HasColumnName("seccion");
+            e.Property(op => op.ModeloEquipo).HasColumnName("modelo_equipo");
+        });
+
+        modelBuilder.Entity<OperacionTalHorizontal>(e =>
+        {
+            e.ToTable("Operacion_tal_horizontal");
+
+            e.Property(op => op.Seccion).HasColumnName("seccion");
+            e.Property(op => op.ModeloEquipo).HasColumnName("modelo_equipo");
+        });
+
+        modelBuilder.Entity<OperacionEmpernador>(e =>
+        {
+            e.ToTable("Operacion_empernador");
+
+            e.Property(op => op.Seccion).HasColumnName("seccion");
+            e.Property(op => op.TipoEquipo).HasColumnName("tipo_equipo");
+        });
+
+        modelBuilder.Entity<OperacionCarguio>(e =>
+        {
+            e.ToTable("Operacion_carguio");
+
+            e.Property(op => op.Seccion).HasColumnName("seccion");
+            e.Property(op => op.Capacidad).HasColumnName("capacidad");
+            e.Property(op => op.TipoEquipo).HasColumnName("tipo_equipo");
+            e.Property(op => op.ProgramaTrabajo).HasColumnName("programa_trabajo");
+        });
+
+        modelBuilder.Entity<OperacionRompebanco>(e =>
+        {
+            e.ToTable("Operacion_rompebanco");
+        });
+
+        modelBuilder.Entity<OperacionScissor>(e =>
+        {
+            e.ToTable("Operacion_scissor");
+
+            e.Property(op => op.Seccion).HasColumnName("seccion");
+            e.Property(op => op.ModeloEquipo).HasColumnName("modelo_equipo");
+        });
+
+        modelBuilder.Entity<OperacionAnfochanger>(e =>
+        {
+            e.ToTable("Operacion_anfochanger");
+
+            e.Property(op => op.Seccion).HasColumnName("seccion");
+            e.Property(op => op.ModeloEquipo).HasColumnName("modelo_equipo");
+        });
+
+        modelBuilder.Entity<OperacionScalamin>(e =>
+        {
+            e.ToTable("Operacion_scalamin");
+
+            e.Property(op => op.Seccion).HasColumnName("seccion");
+            e.Property(op => op.ModeloEquipo).HasColumnName("modelo_equipo");
+        });
+
+        modelBuilder.Entity<OperacionDumper>(e =>
+        {
+            e.ToTable("Operacion_dumper");
+
+            e.Property(op => op.Seccion).HasColumnName("seccion");
+            e.Property(op => op.Capacidad).HasColumnName("capacidad");
+            e.Property(op => op.TipoEquipo).HasColumnName("tipo_equipo");
+            e.Property(op => op.ProgramaTrabajo).HasColumnName("programa_trabajo");
+            e.Property(op => op.CheckListTelemando).HasColumnName("check_list_telemando");
+        });
     }
 }
