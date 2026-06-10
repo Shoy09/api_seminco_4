@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Seminco.Domain.Catalogs;
+using Seminco.Domain.Exploraciones;
 using Seminco.Domain.Operaciones;
 using Seminco.Domain.Planes;
 using Seminco.Domain.Users;
@@ -38,6 +39,13 @@ public sealed class SemincoDbContext(DbContextOptions<SemincoDbContext> options)
     public DbSet<PlanMetraje> PlanesMetraje => Set<PlanMetraje>();
     public DbSet<PlanProduccion> PlanesProduccion => Set<PlanProduccion>();
     public DbSet<FechaPlanMensual> FechasPlanMensual => Set<FechaPlanMensual>();
+    public DbSet<NubeExploracion> NubeExploraciones => Set<NubeExploracion>();
+    public DbSet<NubeDespacho> NubeDespachos => Set<NubeDespacho>();
+    public DbSet<NubeDespachoDetalle> NubeDespachoDetalles => Set<NubeDespachoDetalle>();
+    public DbSet<NubeDetalleDespachoExplosivo> NubeDetalleDespachoExplosivos => Set<NubeDetalleDespachoExplosivo>();
+    public DbSet<NubeDevolucion> NubeDevoluciones => Set<NubeDevolucion>();
+    public DbSet<NubeDevolucionDetalle> NubeDevolucionDetalles => Set<NubeDevolucionDetalle>();
+    public DbSet<NubeDetalleDevolucionExplosivo> NubeDetalleDevolucionExplosivos => Set<NubeDetalleDevolucionExplosivo>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -224,6 +232,120 @@ public sealed class SemincoDbContext(DbContextOptions<SemincoDbContext> options)
 
         ConfigureOperaciones(modelBuilder);
         ConfigurePlanes(modelBuilder);
+        ConfigureExploraciones(modelBuilder);
+    }
+
+    private static void ConfigureExploraciones(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<NubeExploracion>(e =>
+        {
+            e.ToTable("nube_datos_trabajo_exploraciones");
+            e.HasKey(x => x.Id);
+            e.Property(x => x.Id).HasColumnName("id").ValueGeneratedOnAdd();
+            e.Property(x => x.Fecha).HasColumnName("fecha");
+            e.Property(x => x.Turno).HasColumnName("turno");
+            e.Property(x => x.Taladro).HasColumnName("taladro");
+            e.Property(x => x.PiesPorTaladro).HasColumnName("pies_por_taladro");
+            e.Property(x => x.Zona).HasColumnName("zona");
+            e.Property(x => x.TipoLabor).HasColumnName("tipo_labor");
+            e.Property(x => x.Labor).HasColumnName("labor");
+            e.Property(x => x.Ala).HasColumnName("ala");
+            e.Property(x => x.Veta).HasColumnName("veta");
+            e.Property(x => x.Nivel).HasColumnName("nivel");
+            e.Property(x => x.TipoPerforacion).HasColumnName("tipo_perforacion");
+            e.Property(x => x.Estado).HasColumnName("estado").HasDefaultValue("Creado");
+            e.Property(x => x.Cerrado).HasColumnName("cerrado").HasDefaultValue(0);
+            e.Property(x => x.Envio).HasColumnName("envio").HasDefaultValue(0);
+            e.Property(x => x.SemanaDefault).HasColumnName("semanaDefault");
+            e.Property(x => x.SemanaSelect).HasColumnName("semanaSelect");
+            e.Property(x => x.Empresa).HasColumnName("empresa");
+            e.Property(x => x.Seccion).HasColumnName("seccion");
+            e.Property(x => x.Medicion).HasColumnName("medicion").HasDefaultValue(0);
+            e.Property(x => x.CreatedAt).HasColumnName("createdAt");
+            e.Property(x => x.UpdatedAt).HasColumnName("updatedAt");
+            e.HasMany(x => x.Despachos).WithOne(x => x.DatosTrabajo).HasForeignKey(x => x.DatosTrabajoId).OnDelete(DeleteBehavior.Cascade);
+            e.HasMany(x => x.Devoluciones).WithOne(x => x.DatosTrabajo).HasForeignKey(x => x.DatosTrabajoId).OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<NubeDespacho>(e =>
+        {
+            e.ToTable("nube_despacho");
+            e.HasKey(x => x.Id);
+            e.Property(x => x.Id).HasColumnName("id").ValueGeneratedOnAdd();
+            e.Property(x => x.DatosTrabajoId).HasColumnName("datos_trabajo_id");
+            e.Property(x => x.MiliSegundo).HasColumnName("mili_segundo");
+            e.Property(x => x.MedioSegundo).HasColumnName("medio_segundo");
+            e.Property(x => x.Observaciones).HasColumnName("observaciones");
+            e.Property(x => x.CreatedAt).HasColumnName("createdAt");
+            e.Property(x => x.UpdatedAt).HasColumnName("updatedAt");
+            e.HasMany(x => x.Detalles).WithOne(x => x.Despacho).HasForeignKey(x => x.DespachoId).OnDelete(DeleteBehavior.Cascade);
+            e.HasMany(x => x.DetallesExplosivos).WithOne(x => x.Despacho).HasForeignKey(x => x.IdDespacho).OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<NubeDespachoDetalle>(e =>
+        {
+            e.ToTable("nube_despacho_detalle");
+            e.HasKey(x => x.Id);
+            e.Property(x => x.Id).HasColumnName("id").ValueGeneratedOnAdd();
+            e.Property(x => x.DespachoId).HasColumnName("despacho_id");
+            e.Property(x => x.NombreMaterial).HasColumnName("nombre_material");
+            e.Property(x => x.Cantidad).HasColumnName("cantidad");
+            e.Property(x => x.CreatedAt).HasColumnName("createdAt");
+            e.Property(x => x.UpdatedAt).HasColumnName("updatedAt");
+        });
+
+        modelBuilder.Entity<NubeDetalleDespachoExplosivo>(e =>
+        {
+            e.ToTable("nube_detalle_despacho_explosivos");
+            e.HasKey(x => x.Id);
+            e.Property(x => x.Id).HasColumnName("id").ValueGeneratedOnAdd();
+            e.Property(x => x.IdDespacho).HasColumnName("id_despacho");
+            e.Property(x => x.Longitud).HasColumnName("longitud");
+            e.Property(x => x.Tipo).HasColumnName("tipo");
+            e.Property(x => x.Retardos).HasColumnName("retardos").HasColumnType("jsonb");
+            e.Property(x => x.CreatedAt).HasColumnName("createdAt");
+            e.Property(x => x.UpdatedAt).HasColumnName("updatedAt");
+        });
+
+        modelBuilder.Entity<NubeDevolucion>(e =>
+        {
+            e.ToTable("nube_devoluciones");
+            e.HasKey(x => x.Id);
+            e.Property(x => x.Id).HasColumnName("id").ValueGeneratedOnAdd();
+            e.Property(x => x.DatosTrabajoId).HasColumnName("datos_trabajo_id");
+            e.Property(x => x.MiliSegundo).HasColumnName("mili_segundo");
+            e.Property(x => x.MedioSegundo).HasColumnName("medio_segundo");
+            e.Property(x => x.Observaciones).HasColumnName("observaciones");
+            e.Property(x => x.CreatedAt).HasColumnName("createdAt");
+            e.Property(x => x.UpdatedAt).HasColumnName("updatedAt");
+            e.HasMany(x => x.Detalles).WithOne(x => x.Devolucion).HasForeignKey(x => x.DevolucionId).OnDelete(DeleteBehavior.Cascade);
+            e.HasMany(x => x.DetallesExplosivos).WithOne(x => x.Devolucion).HasForeignKey(x => x.IdDevolucion).OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<NubeDevolucionDetalle>(e =>
+        {
+            e.ToTable("nube_devolucion_detalle");
+            e.HasKey(x => x.Id);
+            e.Property(x => x.Id).HasColumnName("id").ValueGeneratedOnAdd();
+            e.Property(x => x.DevolucionId).HasColumnName("devolucion_id");
+            e.Property(x => x.NombreMaterial).HasColumnName("nombre_material");
+            e.Property(x => x.Cantidad).HasColumnName("cantidad");
+            e.Property(x => x.CreatedAt).HasColumnName("createdAt");
+            e.Property(x => x.UpdatedAt).HasColumnName("updatedAt");
+        });
+
+        modelBuilder.Entity<NubeDetalleDevolucionExplosivo>(e =>
+        {
+            e.ToTable("nube_detalle_devoluciones_explosivos");
+            e.HasKey(x => x.Id);
+            e.Property(x => x.Id).HasColumnName("id").ValueGeneratedOnAdd();
+            e.Property(x => x.IdDevolucion).HasColumnName("id_devolucion");
+            e.Property(x => x.Longitud).HasColumnName("longitud");
+            e.Property(x => x.Tipo).HasColumnName("tipo");
+            e.Property(x => x.Retardos).HasColumnName("retardos").HasColumnType("jsonb");
+            e.Property(x => x.CreatedAt).HasColumnName("createdAt");
+            e.Property(x => x.UpdatedAt).HasColumnName("updatedAt");
+        });
     }
 
     private static void ConfigurePlanes(ModelBuilder modelBuilder)

@@ -7,11 +7,13 @@ using Seminco.Infrastructure.Persistence;
 using Seminco.Infrastructure.Catalogs.Services;
 using Seminco.Application.Auth;
 using Seminco.Application.Catalogs;
+using Seminco.Application.Exploraciones;
 using Seminco.Application.Operaciones;
 using Seminco.Application.Planes;
 using Seminco.Application.Users;
 using Seminco.Infrastructure.Auth;
 using Seminco.Infrastructure.Operaciones;
+using Seminco.Infrastructure.Exploraciones;
 using Seminco.Infrastructure.Planes;
 using Seminco.Infrastructure.Users;
 
@@ -51,6 +53,7 @@ public static class DependencyInjection
         services.AddSingleton<IPasswordVerifier, BCryptPasswordVerifier>();
         services.AddSingleton<IJwtTokenIssuer, JwtTokenIssuer>();
         services.AddScoped<IOperacionService, OperacionService>();
+        services.AddScoped<INubeExploracionService, NubeExploracionService>();
 
         RegisterCatalogServices(services);
         RegisterPlanServices(services);
