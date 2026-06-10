@@ -17,4 +17,7 @@ public sealed class BCryptPasswordVerifier : IPasswordVerifier
             return false;
         }
     }
+
+    public string Hash(string password) =>
+        BCrypt.Net.BCrypt.HashPassword(password, workFactor: 12);
 }

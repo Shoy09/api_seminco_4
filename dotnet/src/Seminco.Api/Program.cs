@@ -16,7 +16,7 @@ builder.Services.AddProblemDetails();
 builder.Services.AddControllers().ConfigureApiBehaviorOptions(options =>
 {
     options.InvalidModelStateResponseFactory = context => new BadRequestObjectResult(new ValidationProblemDetails(context.ModelState)
-        { Title = "Validation failed", Status = StatusCodes.Status400BadRequest });
+    { Title = "Validation failed", Status = StatusCodes.Status400BadRequest });
 });
 builder.Services.AddCors(options => options.AddPolicy("SemincoCors", policy =>
 {
@@ -27,10 +27,14 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
 {
     options.TokenValidationParameters = new TokenValidationParameters
     {
-        ValidateIssuerSigningKey = true, IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwt.Secret)),
-        ValidateIssuer = true, ValidIssuer = jwt.Issuer,
-        ValidateAudience = true, ValidAudience = jwt.Audience,
-        ValidateLifetime = true, ClockSkew = TimeSpan.FromMinutes(1)
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwt.Secret)),
+        ValidateIssuer = true,
+        ValidIssuer = jwt.Issuer,
+        ValidateAudience = true,
+        ValidAudience = jwt.Audience,
+        ValidateLifetime = true,
+        ClockSkew = TimeSpan.FromMinutes(1)
     };
     options.Events = new JwtBearerEvents
     {

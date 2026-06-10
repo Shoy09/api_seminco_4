@@ -38,6 +38,7 @@ public static class DependencyInjection
         });
 
         services.AddScoped<LoginService>();
+        services.AddScoped<RegisterService>();
         services.AddScoped<UserProfileService>();
         services.AddScoped<IUserAuthRepository, UserRepository>();
         services.AddScoped<IUserProfileRepository, UserRepository>();

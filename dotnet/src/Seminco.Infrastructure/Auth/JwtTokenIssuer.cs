@@ -20,7 +20,8 @@ public sealed class JwtTokenIssuer(IOptions<JwtOptions> options) : IJwtTokenIssu
             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
             new Claim("codigo_dni", user.CodigoDni),
             new Claim("apellidos", user.Apellidos),
-            new Claim("nombres", user.Nombres)
+            new Claim("nombres", user.Nombres),
+            new Claim(ClaimTypes.Role, user.Rol ?? "trabajador")
         };
 
         var credentials = new SigningCredentials(

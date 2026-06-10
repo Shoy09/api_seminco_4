@@ -30,6 +30,8 @@ public sealed class SemincoDbContext(DbContextOptions<SemincoDbContext> options)
             entity.Property(user => user.OperacionesAutorizadas).HasColumnName("operaciones_autorizadas").HasColumnType("jsonb");
             entity.Property(user => user.CreatedAt).HasColumnName("createdAt");
             entity.Property(user => user.UpdatedAt).HasColumnName("updatedAt");
+            entity.HasIndex(user => user.CodigoDni).IsUnique().HasDatabaseName("ix_usuarios_codigo_dni");
+            entity.HasIndex(user => user.Correo).IsUnique().HasDatabaseName("ix_usuarios_correo").HasFilter("\"correo\" IS NOT NULL");
         });
     }
 }
