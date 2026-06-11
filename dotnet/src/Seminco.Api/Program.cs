@@ -9,7 +9,21 @@ using Seminco.Infrastructure.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 var jwt = builder.Configuration.GetJwtOptions();
-//var origins = builder.Configuration.GetSection(HostingOptions.SectionName).Get<HostingOptions>()?.AllowedOrigins ?? [];
+var configuredOrigins = builder.Configuration
+    .GetSection(HostingOptions.SectionName)
+    .Get<HostingOptions>()?
+    .AllowedOrigins ?? [];
+var corsOrigins = configuredOrigins
+    .Concat([
+        "http://localhost:4200",
+        "http://127.0.0.1:4200",
+        "https://localhost:4200",
+        "https://127.0.0.1:4200"
+    ])
+    .Where(origin => !string.IsNullOrWhiteSpace(origin))
+    .Select(origin => origin.Trim())
+    .Distinct(StringComparer.OrdinalIgnoreCase)
+    .ToArray();
 
 builder.Services.AddSemincoInfrastructure(builder.Configuration);
 builder.Services.AddProblemDetails();
@@ -23,11 +37,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy("SemincoCors", policy =>
     {
         policy
-            .WithOrigins(
-                "http://localhost:4200",
-                "http://127.0.0.1:4200",
-                "https://localhost:4200"
-            )
+            .WithOrigins(corsOrigins)
             .AllowAnyHeader()
             .AllowAnyMethod()
             .AllowCredentials();
