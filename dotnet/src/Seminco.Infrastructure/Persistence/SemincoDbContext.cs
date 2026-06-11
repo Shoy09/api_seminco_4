@@ -564,6 +564,7 @@ public sealed class SemincoDbContext(DbContextOptions<SemincoDbContext> options)
         e.Property(x => x.EquipoNombre).HasColumnName("equipo_nombre");
         e.Property(x => x.NEquipo).HasColumnName("n_equipo");
         e.Property(x => x.Seccion).HasColumnName("seccion");
+        e.Property(x => x.SeccionId).HasColumnName("seccion_id");
         e.Property(x => x.ModeloEquipo).HasColumnName("modelo_equipo");
         e.Property(x => x.Estado).HasColumnName("estado");
         e.Property(x => x.Envio).HasColumnName("envio");
@@ -583,6 +584,11 @@ public sealed class SemincoDbContext(DbContextOptions<SemincoDbContext> options)
             .WithOne(x => x.Operacion)
             .HasForeignKey<OperacionTalHorizontalCondicionEquipo>(x => x.OperacionId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        e.HasOne(x => x.SeccionNav)
+            .WithMany()
+            .HasForeignKey(x => x.SeccionId)
+            .OnDelete(DeleteBehavior.SetNull);
 
         e.HasMany(x => x.Horometros)
             .WithOne(x => x.Operacion)

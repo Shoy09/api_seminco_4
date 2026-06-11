@@ -1,5 +1,7 @@
 namespace Seminco.Domain.OperacionesV2;
 
+using Seminco.Domain.Catalogs;
+
 public sealed class OperacionTalHorizontal
 {
     public int Id { get; set; }
@@ -13,6 +15,8 @@ public sealed class OperacionTalHorizontal
     public string? NEquipo { get; set; }
 
     public string? Seccion { get; set; }
+    public int? SeccionId { get; set; }
+    public Seccion? SeccionNav { get; set; }
     public string? ModeloEquipo { get; set; }
 
     public string Estado { get; set; } = "activo";

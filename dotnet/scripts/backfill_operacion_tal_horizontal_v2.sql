@@ -14,6 +14,7 @@ ON CONFLICT (legacy_id) DO NOTHING;
 WITH source_rows AS (
     SELECT
         o.id AS legacy_id,
+        s.id AS seccion_id,
         CASE
             WHEN o.fecha IS NULL OR btrim(o.fecha) = '' THEN now()
             WHEN o.fecha ~ '^\d{4}-\d{2}-\d{2}$' THEN ((o.fecha || ' 00:00:00')::timestamp AT TIME ZONE 'UTC')
@@ -45,6 +46,19 @@ WITH source_rows AS (
         now() AS created_at,
         now() AS updated_at
     FROM "Operacion_tal_horizontal" o
+    LEFT JOIN secciones s ON o.seccion IS NOT NULL AND btrim(o.seccion) <> ''
+        AND (
+            (
+                position(',' in o.seccion) > 0
+                AND s.proceso = TRIM(SPLIT_PART(o.seccion, ',', 1))
+                AND s.nombre = TRIM(SPLIT_PART(o.seccion, ',', 2))
+            )
+            OR (
+                position(',' in o.seccion) = 0
+                AND s.proceso = 'PERFORACIÓN HORIZONTAL'
+                AND s.nombre = btrim(o.seccion)
+            )
+        )
     WHERE NOT EXISTS (
         SELECT 1
         FROM tmp_otv2_map m
@@ -59,6 +73,7 @@ WITH source_rows AS (
         equipo_nombre,
         n_equipo,
         seccion,
+        seccion_id,
         modelo_equipo,
         estado,
         envio,
@@ -81,6 +96,7 @@ WITH source_rows AS (
         s.equipo_nombre,
         s.n_equipo,
         s.seccion,
+        s.seccion_id,
         s.modelo_equipo,
         s.estado,
         s.envio,

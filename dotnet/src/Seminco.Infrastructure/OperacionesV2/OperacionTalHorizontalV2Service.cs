@@ -12,6 +12,7 @@ public sealed class OperacionTalHorizontalV2Service(SemincoDbContext db) : IOper
 {
     private const string ProcesoChecklist = "PERFORACIÓN HORIZONTAL";
     private const string ProcesoEstado = "PERFORACIÓN HORIZONTAL";
+    private const string ProcesoSeccion = "PERFORACIÓN HORIZONTAL";
     private static readonly JsonSerializerOptions JsonOptions = new() { PropertyNameCaseInsensitive = true };
 
     public async Task<OperacionTalHorizontalV2ResponseDto> CreateAsync(JsonElement body, CancellationToken ct)
@@ -62,6 +63,7 @@ public sealed class OperacionTalHorizontalV2Service(SemincoDbContext db) : IOper
         entity.EquipoNombre = request.Equipo;
         entity.NEquipo = request.NEquipo;
         entity.Seccion = request.Seccion;
+        entity.SeccionId = await ResolveSeccionIdAsync(request.Seccion, ct);
         entity.ModeloEquipo = request.ModeloEquipo;
         entity.Estado = string.IsNullOrWhiteSpace(request.Estado) ? "activo" : request.Estado;
         entity.Envio = request.Envio ?? 0;
@@ -98,6 +100,32 @@ public sealed class OperacionTalHorizontalV2Service(SemincoDbContext db) : IOper
     private static OperacionTalHorizontalUpsertRequest Deserialize(JsonElement body) =>
         JsonSerializer.Deserialize<OperacionTalHorizontalUpsertRequest>(body.GetRawText(), JsonOptions)
         ?? throw new InvalidOperationException("No se pudo deserializar la operación tal_horizontal V2");
+
+    private async Task<int?> ResolveSeccionIdAsync(string? seccion, CancellationToken ct)
+    {
+        if (string.IsNullOrWhiteSpace(seccion)) return null;
+
+        var parts = seccion.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+        var proceso = parts.Length == 2 ? parts[0].Trim().ToUpperInvariant() : ProcesoSeccion;
+        var nombre = parts.Length switch
+        {
+            1 => parts[0].Trim().ToUpperInvariant(),
+            2 => parts[1].Trim().ToUpperInvariant(),
+            _ => string.Empty
+        };
+
+        if (string.IsNullOrWhiteSpace(nombre)) return null;
+
+        var matched = await db.Secciones
+            .AsNoTracking()
+            .Where(x => x.Proceso != null && x.Nombre != null
+                && x.Proceso.ToUpper() == proceso
+                && x.Nombre.ToUpper() == nombre)
+            .Select(x => (int?)x.Id)
+            .FirstOrDefaultAsync(ct);
+
+        return matched;
+    }
 
     private static DateTime ParseFecha(string? value)
     {
