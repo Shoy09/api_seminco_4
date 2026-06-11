@@ -59,6 +59,10 @@ public static class DependencyInjection
         services.AddScoped<IOperacionService, OperacionService>();
         services.AddScoped<IOperacionTalHorizontalV2Service, OperacionTalHorizontalV2Service>();
         services.AddScoped<IOperacionCarguioV2Service, OperacionCarguioV2Service>();
+        services.AddScoped<IOperacionTalLargoV2Service, OperacionTalLargoV2Service>();
+        services.AddScoped<IOperacionEmpernadorV2Service, OperacionEmpernadorV2Service>();
+        services.AddScoped<IOperacionScalaminV2Service, OperacionScalaminV2Service>();
+        services.AddScoped<IOperacionScissorV2Service, OperacionScissorV2Service>();
         services.AddScoped<INubeExploracionService, NubeExploracionService>();
         services.AddScoped<IMedicionHorizontalService, MedicionHorizontalService>();
 

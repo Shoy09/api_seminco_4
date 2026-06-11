@@ -11,14 +11,12 @@ namespace Seminco.Api.Controllers;
 public sealed class OperacionesController(
     IOperacionService service,
     IOperacionTalHorizontalV2Service talHorizontalV2Service,
-    IOperacionCarguioV2Service carguioV2Service) : ControllerBase
+    IOperacionCarguioV2Service carguioV2Service,
+    IOperacionTalLargoV2Service talLargoV2Service,
+    IOperacionEmpernadorV2Service empernadorV2Service,
+    IOperacionScalaminV2Service scalaminV2Service,
+    IOperacionScissorV2Service scissorV2Service) : ControllerBase
 {
-    private static bool UsaTalHorizontalV2(string tipo) =>
-        string.Equals(tipo, "tal_horizontal", StringComparison.OrdinalIgnoreCase);
-
-    private static bool UsaCarguioV2(string tipo) =>
-        string.Equals(tipo, "carguio", StringComparison.OrdinalIgnoreCase);
-
     [HttpPost("crear")]
     [AllowAnonymous]
     public async Task<ActionResult> Crear([FromBody] JsonElement body, CancellationToken ct)
@@ -41,11 +39,16 @@ public sealed class OperacionesController(
     {
         try
         {
-            var result = UsaTalHorizontalV2(tipo)
-                ? await talHorizontalV2Service.GetAllAsync(estado, envio, ct)
-                : UsaCarguioV2(tipo)
-                    ? await carguioV2Service.GetAllAsync(estado, envio, ct)
-                    : await service.GetAllAsync(tipo, estado, envio, ct);
+            var result = tipo.ToLowerInvariant() switch
+            {
+                "tal_horizontal" => await talHorizontalV2Service.GetAllAsync(estado, envio, ct),
+                "carguio" => await carguioV2Service.GetAllAsync(estado, envio, ct),
+                "tal_largo" => await talLargoV2Service.GetAllAsync(estado, envio, ct),
+                "empernador" => await empernadorV2Service.GetAllAsync(estado, envio, ct),
+                "scalamin" => await scalaminV2Service.GetAllAsync(estado, envio, ct),
+                "scissor" => await scissorV2Service.GetAllAsync(estado, envio, ct),
+                _ => await service.GetAllAsync(tipo, estado, envio, ct)
+            };
             return Ok(new { ok = true, data = result });
         }
         catch (ArgumentException ex)
@@ -59,11 +62,16 @@ public sealed class OperacionesController(
     {
         try
         {
-            var result = UsaTalHorizontalV2(tipo)
-                ? await talHorizontalV2Service.GetByAprobacionAsync(estado, envio, ct)
-                : UsaCarguioV2(tipo)
-                    ? await carguioV2Service.GetByAprobacionAsync(estado, envio, ct)
-                    : await service.GetByAprobacionAsync(tipo, estado, envio, ct);
+            var result = tipo.ToLowerInvariant() switch
+            {
+                "tal_horizontal" => await talHorizontalV2Service.GetByAprobacionAsync(estado, envio, ct),
+                "carguio" => await carguioV2Service.GetByAprobacionAsync(estado, envio, ct),
+                "tal_largo" => await talLargoV2Service.GetByAprobacionAsync(estado, envio, ct),
+                "empernador" => await empernadorV2Service.GetByAprobacionAsync(estado, envio, ct),
+                "scalamin" => await scalaminV2Service.GetByAprobacionAsync(estado, envio, ct),
+                "scissor" => await scissorV2Service.GetByAprobacionAsync(estado, envio, ct),
+                _ => await service.GetByAprobacionAsync(tipo, estado, envio, ct)
+            };
             return Ok(new { ok = true, data = result });
         }
         catch (ArgumentException ex)
@@ -92,11 +100,16 @@ public sealed class OperacionesController(
 
         try
         {
-            var result = UsaTalHorizontalV2(tipo)
-                ? await talHorizontalV2Service.GetByJefeAsync(jefe_guardia, limit, offset, ct)
-                : UsaCarguioV2(tipo)
-                    ? await carguioV2Service.GetByJefeAsync(jefe_guardia, limit, offset, ct)
-                    : await service.GetByJefeAsync(tipo, jefe_guardia, limit, offset, ct);
+            var result = tipo.ToLowerInvariant() switch
+            {
+                "tal_horizontal" => await talHorizontalV2Service.GetByJefeAsync(jefe_guardia, limit, offset, ct),
+                "carguio" => await carguioV2Service.GetByJefeAsync(jefe_guardia, limit, offset, ct),
+                "tal_largo" => await talLargoV2Service.GetByJefeAsync(jefe_guardia, limit, offset, ct),
+                "empernador" => await empernadorV2Service.GetByJefeAsync(jefe_guardia, limit, offset, ct),
+                "scalamin" => await scalaminV2Service.GetByJefeAsync(jefe_guardia, limit, offset, ct),
+                "scissor" => await scissorV2Service.GetByJefeAsync(jefe_guardia, limit, offset, ct),
+                _ => await service.GetByJefeAsync(tipo, jefe_guardia, limit, offset, ct)
+            };
             return Ok(new { ok = true, data = result });
         }
         catch (ArgumentException ex)
@@ -110,11 +123,16 @@ public sealed class OperacionesController(
     {
         try
         {
-            var result = UsaTalHorizontalV2(tipo)
-                ? await talHorizontalV2Service.GetByIdAsync(id, ct)
-                : UsaCarguioV2(tipo)
-                    ? await carguioV2Service.GetByIdAsync(id, ct)
-                    : await service.GetByIdAsync(tipo, id, ct);
+            var result = tipo.ToLowerInvariant() switch
+            {
+                "tal_horizontal" => await talHorizontalV2Service.GetByIdAsync(id, ct),
+                "carguio" => await carguioV2Service.GetByIdAsync(id, ct),
+                "tal_largo" => await talLargoV2Service.GetByIdAsync(id, ct),
+                "empernador" => await empernadorV2Service.GetByIdAsync(id, ct),
+                "scalamin" => await scalaminV2Service.GetByIdAsync(id, ct),
+                "scissor" => await scissorV2Service.GetByIdAsync(id, ct),
+                _ => await service.GetByIdAsync(tipo, id, ct)
+            };
             if (result is null)
                 return NotFound(new { ok = false, error = "Registro no encontrado" });
             return Ok(new { ok = true, data = result });
