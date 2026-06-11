@@ -12,8 +12,8 @@ using Seminco.Infrastructure.Persistence;
 namespace Seminco.Infrastructure.Migrations
 {
     [DbContext(typeof(SemincoDbContext))]
-    [Migration("20260611000910_SeedChecklistItemCatalog")]
-    partial class SeedChecklistItemCatalog
+    [Migration("20260611003745_UseChecklistItemsForOperacionTalHorizontal")]
+    partial class UseChecklistItemsForOperacionTalHorizontal
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -992,47 +992,6 @@ namespace Seminco.Infrastructure.Migrations
                     b.ToTable((string)null);
 
                     b.UseTpcMappingStrategy();
-                });
-
-            modelBuilder.Entity("Seminco.Domain.OperacionesV2.ChecklistItemCatalog", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<bool>("Activo")
-                        .HasColumnType("boolean")
-                        .HasColumnName("activo");
-
-                    b.Property<string>("Categoria")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("categoria");
-
-                    b.Property<string>("Descripcion")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("descripcion");
-
-                    b.Property<int>("Orden")
-                        .HasColumnType("integer")
-                        .HasColumnName("orden");
-
-                    b.Property<string>("Proceso")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("proceso");
-
-                    b.Property<int>("Version")
-                        .HasColumnType("integer")
-                        .HasColumnName("version");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("checklist_item_catalog", (string)null);
                 });
 
             modelBuilder.Entity("Seminco.Domain.OperacionesV2.OperacionTalHorizontal", b =>
@@ -2722,8 +2681,8 @@ namespace Seminco.Infrastructure.Migrations
 
             modelBuilder.Entity("Seminco.Domain.OperacionesV2.OperacionTalHorizontalChecklistRespuesta", b =>
                 {
-                    b.HasOne("Seminco.Domain.OperacionesV2.ChecklistItemCatalog", "ChecklistItem")
-                        .WithMany("Respuestas")
+                    b.HasOne("Seminco.Domain.Catalogs.CheckListItem", "ChecklistItem")
+                        .WithMany()
                         .HasForeignKey("ChecklistItemId")
                         .OnDelete(DeleteBehavior.SetNull);
 
@@ -2812,11 +2771,6 @@ namespace Seminco.Infrastructure.Migrations
                     b.Navigation("Despachos");
 
                     b.Navigation("Devoluciones");
-                });
-
-            modelBuilder.Entity("Seminco.Domain.OperacionesV2.ChecklistItemCatalog", b =>
-                {
-                    b.Navigation("Respuestas");
                 });
 
             modelBuilder.Entity("Seminco.Domain.OperacionesV2.OperacionTalHorizontal", b =>

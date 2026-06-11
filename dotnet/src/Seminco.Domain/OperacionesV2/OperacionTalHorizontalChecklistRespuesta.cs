@@ -1,3 +1,5 @@
+using Seminco.Domain.Catalogs;
+
 namespace Seminco.Domain.OperacionesV2;
 
 public sealed class OperacionTalHorizontalChecklistRespuesta
@@ -13,5 +15,5 @@ public sealed class OperacionTalHorizontalChecklistRespuesta
     public string? Observacion { get; set; }
 
     public OperacionTalHorizontal Operacion { get; set; } = null!;
-    public ChecklistItemCatalog? ChecklistItem { get; set; }
+    public CheckListItem? ChecklistItem { get; set; }
 }

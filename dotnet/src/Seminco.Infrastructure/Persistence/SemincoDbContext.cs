@@ -52,7 +52,6 @@ public sealed class SemincoDbContext(DbContextOptions<SemincoDbContext> options)
     public DbSet<Seminco.Domain.OperacionesV2.OperacionTalHorizontal> OperacionesTalHorizontalV2 => Set<Domain.OperacionesV2.OperacionTalHorizontal>();
     public DbSet<OperacionTalHorizontalHorometro> OperacionesTalHorizontalHorometros => Set<OperacionTalHorizontalHorometro>();
     public DbSet<OperacionTalHorizontalCondicionEquipo> OperacionesTalHorizontalCondicionesEquipo => Set<OperacionTalHorizontalCondicionEquipo>();
-    public DbSet<ChecklistItemCatalog> ChecklistItemsCatalog => Set<ChecklistItemCatalog>();
     public DbSet<OperacionTalHorizontalChecklistRespuesta> OperacionesTalHorizontalChecklistRespuestas => Set<OperacionTalHorizontalChecklistRespuesta>();
     public DbSet<OperacionTalHorizontalControlLlanta> OperacionesTalHorizontalControlLlantas => Set<OperacionTalHorizontalControlLlanta>();
     public DbSet<OperacionTalHorizontalRegistro> OperacionesTalHorizontalRegistros => Set<OperacionTalHorizontalRegistro>();
@@ -639,20 +638,6 @@ public sealed class SemincoDbContext(DbContextOptions<SemincoDbContext> options)
         e.Property(x => x.HoraLlenado).HasColumnName("hora_llenado");
     });
 
-    modelBuilder.Entity<ChecklistItemCatalog>(e =>
-    {
-        e.ToTable("checklist_item_catalog");
-        e.HasKey(x => x.Id);
-
-        e.Property(x => x.Id).HasColumnName("id").ValueGeneratedOnAdd();
-        e.Property(x => x.Proceso).HasColumnName("proceso");
-        e.Property(x => x.Categoria).HasColumnName("categoria");
-        e.Property(x => x.Descripcion).HasColumnName("descripcion");
-        e.Property(x => x.Orden).HasColumnName("orden");
-        e.Property(x => x.Activo).HasColumnName("activo");
-        e.Property(x => x.Version).HasColumnName("version");
-    });
-
     modelBuilder.Entity<OperacionTalHorizontalChecklistRespuesta>(e =>
     {
         e.ToTable("operacion_tal_horizontal_checklist");
@@ -667,7 +652,7 @@ public sealed class SemincoDbContext(DbContextOptions<SemincoDbContext> options)
         e.Property(x => x.Observacion).HasColumnName("observacion");
 
         e.HasOne(x => x.ChecklistItem)
-            .WithMany(x => x.Respuestas)
+            .WithMany()
             .HasForeignKey(x => x.ChecklistItemId)
             .OnDelete(DeleteBehavior.SetNull);
     });
