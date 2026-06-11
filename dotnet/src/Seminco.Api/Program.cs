@@ -9,7 +9,7 @@ using Seminco.Infrastructure.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 var jwt = builder.Configuration.GetJwtOptions();
-var origins = builder.Configuration.GetSection(HostingOptions.SectionName).Get<HostingOptions>()?.AllowedOrigins ?? [];
+//var origins = builder.Configuration.GetSection(HostingOptions.SectionName).Get<HostingOptions>()?.AllowedOrigins ?? [];
 
 builder.Services.AddSemincoInfrastructure(builder.Configuration);
 builder.Services.AddProblemDetails();
@@ -18,11 +18,21 @@ builder.Services.AddControllers().ConfigureApiBehaviorOptions(options =>
     options.InvalidModelStateResponseFactory = context => new BadRequestObjectResult(new ValidationProblemDetails(context.ModelState)
     { Title = "Validation failed", Status = StatusCodes.Status400BadRequest });
 });
-builder.Services.AddCors(options => options.AddPolicy("SemincoCors", policy =>
+builder.Services.AddCors(options =>
 {
-    if (origins.Length > 0) policy.WithOrigins(origins).AllowAnyHeader().AllowAnyMethod();
-    else policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
-}));
+    options.AddPolicy("SemincoCors", policy =>
+    {
+        policy
+            .WithOrigins(
+                "http://localhost:4200",
+                "http://127.0.0.1:4200",
+                "https://localhost:4200"
+            )
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials();
+    });
+});
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
 {
     options.TokenValidationParameters = new TokenValidationParameters

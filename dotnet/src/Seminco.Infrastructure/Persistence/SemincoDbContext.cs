@@ -6,7 +6,7 @@ using Seminco.Domain.Mediciones;
 using Seminco.Domain.Operaciones;
 using Seminco.Domain.Planes;
 using Seminco.Domain.Users;
-
+using Seminco.Domain.OperacionesV2;
 namespace Seminco.Infrastructure.Persistence;
 
 public sealed class SemincoDbContext(DbContextOptions<SemincoDbContext> options) : DbContext(options)
@@ -28,7 +28,7 @@ public sealed class SemincoDbContext(DbContextOptions<SemincoDbContext> options)
     public DbSet<ExplosivoUni> ExplosivosUni => Set<ExplosivoUni>();
     public DbSet<NumeroRetardo> NumerosRetardo => Set<NumeroRetardo>();
     public DbSet<OperacionTalLargo> OperacionesTalLargo => Set<OperacionTalLargo>();
-    public DbSet<OperacionTalHorizontal> OperacionesTalHorizontal => Set<OperacionTalHorizontal>();
+    public DbSet<Domain.Operaciones.OperacionTalHorizontal> OperacionesTalHorizontal => Set<Domain.Operaciones.OperacionTalHorizontal>();
     public DbSet<OperacionEmpernador> OperacionesEmpernador => Set<OperacionEmpernador>();
     public DbSet<OperacionCarguio> OperacionesCarguio => Set<OperacionCarguio>();
     public DbSet<OperacionRompebanco> OperacionesRompebanco => Set<OperacionRompebanco>();
@@ -48,6 +48,15 @@ public sealed class SemincoDbContext(DbContextOptions<SemincoDbContext> options)
     public DbSet<NubeDevolucionDetalle> NubeDevolucionDetalles => Set<NubeDevolucionDetalle>();
     public DbSet<NubeDetalleDevolucionExplosivo> NubeDetalleDevolucionExplosivos => Set<NubeDetalleDevolucionExplosivo>();
     public DbSet<MedicionHorizontal> MedicionesHorizontal => Set<MedicionHorizontal>();
+
+    public DbSet<Seminco.Domain.OperacionesV2.OperacionTalHorizontal> OperacionesTalHorizontalV2 => Set<Domain.OperacionesV2.OperacionTalHorizontal>();
+    public DbSet<OperacionTalHorizontalHorometro> OperacionesTalHorizontalHorometros => Set<OperacionTalHorizontalHorometro>();
+    public DbSet<OperacionTalHorizontalCondicionEquipo> OperacionesTalHorizontalCondicionesEquipo => Set<OperacionTalHorizontalCondicionEquipo>();
+    public DbSet<ChecklistItemCatalog> ChecklistItemsCatalog => Set<ChecklistItemCatalog>();
+    public DbSet<OperacionTalHorizontalChecklistRespuesta> OperacionesTalHorizontalChecklistRespuestas => Set<OperacionTalHorizontalChecklistRespuesta>();
+    public DbSet<OperacionTalHorizontalControlLlanta> OperacionesTalHorizontalControlLlantas => Set<OperacionTalHorizontalControlLlanta>();
+    public DbSet<OperacionTalHorizontalRegistro> OperacionesTalHorizontalRegistros => Set<OperacionTalHorizontalRegistro>();
+    public DbSet<OperacionTalHorizontalRegistroDetalle> OperacionesTalHorizontalRegistroDetalles => Set<OperacionTalHorizontalRegistroDetalle>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -236,6 +245,7 @@ public sealed class SemincoDbContext(DbContextOptions<SemincoDbContext> options)
         ConfigurePlanes(modelBuilder);
         ConfigureExploraciones(modelBuilder);
         ConfigureMediciones(modelBuilder);
+        ConfigureOperacionesTalHorizontalV2(modelBuilder);
     }
 
     private static void ConfigureMediciones(ModelBuilder modelBuilder)
@@ -472,7 +482,7 @@ public sealed class SemincoDbContext(DbContextOptions<SemincoDbContext> options)
             e.Property(op => op.ModeloEquipo).HasColumnName("modelo_equipo");
         });
 
-        modelBuilder.Entity<OperacionTalHorizontal>(e =>
+        modelBuilder.Entity<Domain.Operaciones.OperacionTalHorizontal>(e =>
         {
             e.ToTable("Operacion_tal_horizontal");
 
@@ -538,4 +548,191 @@ public sealed class SemincoDbContext(DbContextOptions<SemincoDbContext> options)
             e.Property(op => op.CheckListTelemando).HasColumnName("check_list_telemando");
         });
     }
+
+    private static void ConfigureOperacionesTalHorizontalV2(ModelBuilder modelBuilder)
+{
+    modelBuilder.Entity<Domain.OperacionesV2.OperacionTalHorizontal>(e =>
+    {
+        e.ToTable("operacion_tal_horizontal_v2");
+        e.HasKey(x => x.Id);
+
+        e.Property(x => x.Id).HasColumnName("id").ValueGeneratedOnAdd();
+        e.Property(x => x.Fecha).HasColumnName("fecha");
+        e.Property(x => x.Turno).HasColumnName("turno");
+        e.Property(x => x.Operador).HasColumnName("operador");
+        e.Property(x => x.JefeGuardia).HasColumnName("jefe_guardia");
+        e.Property(x => x.EquipoId).HasColumnName("equipo_id");
+        e.Property(x => x.EquipoNombre).HasColumnName("equipo_nombre");
+        e.Property(x => x.NEquipo).HasColumnName("n_equipo");
+        e.Property(x => x.Seccion).HasColumnName("seccion");
+        e.Property(x => x.ModeloEquipo).HasColumnName("modelo_equipo");
+        e.Property(x => x.Estado).HasColumnName("estado");
+        e.Property(x => x.Envio).HasColumnName("envio");
+        e.Property(x => x.Revisado).HasColumnName("revisado");
+        e.Property(x => x.Aprobacion).HasColumnName("aprobacion");
+        e.Property(x => x.ObservacionesJefe).HasColumnName("observaciones_jefe");
+        e.Property(x => x.ObservacionesJefe2).HasColumnName("observaciones_jefe2");
+        e.Property(x => x.ObservacionesJefe3).HasColumnName("observaciones_jefe3");
+        e.Property(x => x.PayloadOriginal).HasColumnName("payload_original").HasColumnType("jsonb");
+        e.Property(x => x.PayloadVersion).HasColumnName("payload_version");
+        e.Property(x => x.ExternalSyncId).HasColumnName("external_sync_id");
+        e.Property(x => x.DeviceId).HasColumnName("device_id");
+        e.Property(x => x.CreatedAt).HasColumnName("created_at");
+        e.Property(x => x.UpdatedAt).HasColumnName("updated_at");
+
+        e.HasOne(x => x.CondicionEquipo)
+            .WithOne(x => x.Operacion)
+            .HasForeignKey<OperacionTalHorizontalCondicionEquipo>(x => x.OperacionId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        e.HasMany(x => x.Horometros)
+            .WithOne(x => x.Operacion)
+            .HasForeignKey(x => x.OperacionId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        e.HasMany(x => x.ChecklistRespuestas)
+            .WithOne(x => x.Operacion)
+            .HasForeignKey(x => x.OperacionId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        e.HasMany(x => x.ControlLlantas)
+            .WithOne(x => x.Operacion)
+            .HasForeignKey(x => x.OperacionId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        e.HasMany(x => x.Registros)
+            .WithOne(x => x.Operacion)
+            .HasForeignKey(x => x.OperacionId)
+            .OnDelete(DeleteBehavior.Cascade);
+    });
+
+    modelBuilder.Entity<OperacionTalHorizontalHorometro>(e =>
+    {
+        e.ToTable("operacion_tal_horizontal_horometro");
+        e.HasKey(x => x.Id);
+
+        e.Property(x => x.Id).HasColumnName("id").ValueGeneratedOnAdd();
+        e.Property(x => x.OperacionId).HasColumnName("operacion_id");
+        e.Property(x => x.Tipo).HasColumnName("tipo");
+        e.Property(x => x.Inicio).HasColumnName("inicio").HasPrecision(10, 2);
+        e.Property(x => x.Final).HasColumnName("final").HasPrecision(10, 2);
+        e.Property(x => x.Op).HasColumnName("op");
+        e.Property(x => x.Inop).HasColumnName("inop");
+
+        e.HasIndex(x => new { x.OperacionId, x.Tipo }).IsUnique();
+    });
+
+    modelBuilder.Entity<OperacionTalHorizontalCondicionEquipo>(e =>
+    {
+        e.ToTable("operacion_tal_horizontal_condicion_equipo");
+        e.HasKey(x => x.OperacionId);
+
+        e.Property(x => x.OperacionId).HasColumnName("operacion_id");
+        e.Property(x => x.Op).HasColumnName("op");
+        e.Property(x => x.NoOp).HasColumnName("no_op");
+        e.Property(x => x.Lugar).HasColumnName("lugar");
+        e.Property(x => x.Descripcion).HasColumnName("descripcion");
+        e.Property(x => x.AceiteMotor).HasColumnName("aceite_motor");
+        e.Property(x => x.AceiteHidraulico).HasColumnName("aceite_hidraulico");
+        e.Property(x => x.AceiteTransmision).HasColumnName("aceite_transmision");
+        e.Property(x => x.Combustible).HasColumnName("combustible");
+        e.Property(x => x.HoraLlenado).HasColumnName("hora_llenado");
+    });
+
+    modelBuilder.Entity<ChecklistItemCatalog>(e =>
+    {
+        e.ToTable("checklist_item_catalog");
+        e.HasKey(x => x.Id);
+
+        e.Property(x => x.Id).HasColumnName("id").ValueGeneratedOnAdd();
+        e.Property(x => x.Proceso).HasColumnName("proceso");
+        e.Property(x => x.Categoria).HasColumnName("categoria");
+        e.Property(x => x.Descripcion).HasColumnName("descripcion");
+        e.Property(x => x.Orden).HasColumnName("orden");
+        e.Property(x => x.Activo).HasColumnName("activo");
+        e.Property(x => x.Version).HasColumnName("version");
+    });
+
+    modelBuilder.Entity<OperacionTalHorizontalChecklistRespuesta>(e =>
+    {
+        e.ToTable("operacion_tal_horizontal_checklist");
+        e.HasKey(x => x.Id);
+
+        e.Property(x => x.Id).HasColumnName("id").ValueGeneratedOnAdd();
+        e.Property(x => x.OperacionId).HasColumnName("operacion_id");
+        e.Property(x => x.ChecklistItemId).HasColumnName("checklist_item_id");
+        e.Property(x => x.CategoriaSnapshot).HasColumnName("categoria_snapshot");
+        e.Property(x => x.DescripcionSnapshot).HasColumnName("descripcion_snapshot");
+        e.Property(x => x.Decision).HasColumnName("decision");
+        e.Property(x => x.Observacion).HasColumnName("observacion");
+
+        e.HasOne(x => x.ChecklistItem)
+            .WithMany(x => x.Respuestas)
+            .HasForeignKey(x => x.ChecklistItemId)
+            .OnDelete(DeleteBehavior.SetNull);
+    });
+
+    modelBuilder.Entity<OperacionTalHorizontalControlLlanta>(e =>
+    {
+        e.ToTable("operacion_tal_horizontal_control_llanta");
+        e.HasKey(x => x.Id);
+
+        e.Property(x => x.Id).HasColumnName("id").ValueGeneratedOnAdd();
+        e.Property(x => x.OperacionId).HasColumnName("operacion_id");
+        e.Property(x => x.Posicion).HasColumnName("posicion");
+        e.Property(x => x.Estado).HasColumnName("estado");
+        e.Property(x => x.Presion).HasColumnName("presion").HasPrecision(10, 2);
+        e.Property(x => x.Observacion).HasColumnName("observacion");
+    });
+
+    modelBuilder.Entity<OperacionTalHorizontalRegistro>(e =>
+    {
+        e.ToTable("operacion_tal_horizontal_registro");
+        e.HasKey(x => x.Id);
+
+        e.Property(x => x.Id).HasColumnName("id").ValueGeneratedOnAdd();
+        e.Property(x => x.OperacionId).HasColumnName("operacion_id");
+        e.Property(x => x.ExternalId).HasColumnName("external_id");
+        e.Property(x => x.Numero).HasColumnName("numero");
+        e.Property(x => x.EstadoPrincipal).HasColumnName("estado_principal");
+        e.Property(x => x.CodigoEstado).HasColumnName("codigo_estado");
+        e.Property(x => x.EstadoCatalogoId).HasColumnName("estado_catalogo_id");
+        e.Property(x => x.HoraInicio).HasColumnName("hora_inicio");
+        e.Property(x => x.HoraFinal).HasColumnName("hora_final");
+        e.Property(x => x.PayloadOperacion).HasColumnName("payload_operacion").HasColumnType("jsonb");
+        e.Property(x => x.CreatedAt).HasColumnName("created_at");
+        e.Property(x => x.UpdatedAt).HasColumnName("updated_at");
+
+        e.HasOne(x => x.Detalle)
+            .WithOne(x => x.Registro)
+            .HasForeignKey<OperacionTalHorizontalRegistroDetalle>(x => x.RegistroId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        e.HasIndex(x => x.OperacionId);
+        e.HasIndex(x => x.CodigoEstado);
+        e.HasIndex(x => x.EstadoPrincipal);
+    });
+
+    modelBuilder.Entity<OperacionTalHorizontalRegistroDetalle>(e =>
+    {
+        e.ToTable("operacion_tal_horizontal_registro_detalle");
+        e.HasKey(x => x.RegistroId);
+
+        e.Property(x => x.RegistroId).HasColumnName("registro_id");
+        e.Property(x => x.Nivel).HasColumnName("nivel");
+        e.Property(x => x.TipoLabor).HasColumnName("tipo_labor");
+        e.Property(x => x.Labor).HasColumnName("labor");
+        e.Property(x => x.Ala).HasColumnName("ala");
+        e.Property(x => x.TalProd).HasColumnName("tal_prod").HasPrecision(10, 2);
+        e.Property(x => x.TalRimados).HasColumnName("tal_rimados").HasPrecision(10, 2);
+        e.Property(x => x.TalAlivio).HasColumnName("tal_alivio").HasPrecision(10, 2);
+        e.Property(x => x.TalRepaso).HasColumnName("tal_repaso").HasPrecision(10, 2);
+        e.Property(x => x.LongBarras).HasColumnName("long_barras").HasPrecision(10, 2);
+        e.Property(x => x.NumBarras).HasColumnName("num_barras").HasPrecision(10, 2);
+        e.Property(x => x.TipoPerforacion).HasColumnName("tipo_perforacion");
+        e.Property(x => x.TipoPerforacionId).HasColumnName("tipo_perforacion_id");
+        e.Property(x => x.Observaciones).HasColumnName("observaciones");
+    });
+}
+
 }

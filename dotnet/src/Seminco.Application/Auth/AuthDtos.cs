@@ -3,9 +3,14 @@ using System.Text.Json.Serialization;
 
 namespace Seminco.Application.Auth;
 
-public sealed record LoginRequest(
-    [property: Required, JsonPropertyName("codigo_dni")] string CodigoDni,
-    [property: Required] string Password);
+public class LoginRequest
+{
+    [Required]
+    [JsonPropertyName("codigo_dni")]
+    public string CodigoDni { get; set; } = null!;
+    [Required]
+    public string Password { get; set; } = null!;
+}
 
 public sealed record LoginResponse(
     [property: JsonPropertyName("token")] string Token,
@@ -18,34 +23,34 @@ public class RegisterRequest
 {
     [Required]
     [JsonPropertyName("codigo_dni")]
-    public string CodigoDni { get; set;} = null!;
+    public string CodigoDni { get; set; } = null!;
     [Required]
     [JsonPropertyName("nombres")]
-    public string Nombres { get; set;} = null!;
+    public string Nombres { get; set; } = null!;
     [Required]
     [JsonPropertyName("apellidos")]
-    public string Apellidos { get; set;} = null!;
+    public string Apellidos { get; set; } = null!;
     [Required]
     [JsonPropertyName("password")]
     [MinLength(6)]
-    public string Password { get; set;} = null!;
+    public string Password { get; set; } = null!;
     [JsonPropertyName("correo")]
-    public string? Correo { get; set;}
+    public string? Correo { get; set; }
     [JsonPropertyName("cargo")]
-    public string? Cargo { get; set;}
+    public string? Cargo { get; set; }
     [JsonPropertyName("area")]
-    public string? Area { get; set;}
+    public string? Area { get; set; }
     [JsonPropertyName("clasificacion")]
-    public string? Clasificacion { get; set;}
+    public string? Clasificacion { get; set; }
     [JsonPropertyName("empresa")]
-    public string? Empresa { get; set;}
+    public string? Empresa { get; set; }
     [JsonPropertyName("guardia")]
-    public string? Guardia { get; set;}
+    public string? Guardia { get; set; }
     [JsonPropertyName("autorizado_equipo")]
-    public string? AutorizadoEquipo { get; set;}
+    public string? AutorizadoEquipo { get; set; }
 
     [JsonPropertyName("rol")]
-    public string? Rol { get; set;} = "trabajador";
+    public string? Rol { get; set; } = "trabajador";
 }
 
 
