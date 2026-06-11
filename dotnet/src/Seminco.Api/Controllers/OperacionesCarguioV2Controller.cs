@@ -1,14 +1,13 @@
 using System.Text.Json;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Seminco.Application.Operaciones;
 using Seminco.Application.OperacionesV2;
 
 namespace Seminco.Api.Controllers;
 
 [ApiController]
-[Route("api/operaciones-v2/tal-horizontal")]
-public sealed class OperacionesTalHorizontalV2Controller(IOperacionTalHorizontalV2Service service) : ControllerBase
+[Route("api/operaciones-v2/carguio")]
+public sealed class OperacionesCarguioV2Controller(IOperacionCarguioV2Service service) : ControllerBase
 {
     [HttpGet("aprobacion")]
     public async Task<ActionResult> ObtenerPorAprobacion([FromQuery] string? estado, [FromQuery] string? envio, CancellationToken ct)
@@ -26,7 +25,7 @@ public sealed class OperacionesTalHorizontalV2Controller(IOperacionTalHorizontal
 
     [HttpPost]
     [AllowAnonymous]
-    public async Task<ActionResult<OperacionTalHorizontalV2ResponseDto>> Create([FromBody] JsonElement body, CancellationToken ct)
+    public async Task<ActionResult<OperacionCarguioV2ResponseDto>> Create([FromBody] JsonElement body, CancellationToken ct)
     {
         try
         {
@@ -40,7 +39,7 @@ public sealed class OperacionesTalHorizontalV2Controller(IOperacionTalHorizontal
 
     [HttpPut("{id:int}")]
     [AllowAnonymous]
-    public async Task<ActionResult<OperacionTalHorizontalV2ResponseDto>> Update(int id, [FromBody] JsonElement body, CancellationToken ct)
+    public async Task<ActionResult<OperacionCarguioV2ResponseDto>> Update(int id, [FromBody] JsonElement body, CancellationToken ct)
     {
         try
         {

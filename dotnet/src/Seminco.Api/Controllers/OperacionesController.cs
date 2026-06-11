@@ -2,13 +2,23 @@ using System.Text.Json;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Seminco.Application.Operaciones;
+using Seminco.Application.OperacionesV2;
 
 namespace Seminco.Api.Controllers;
 
 [ApiController]
 [Route("api/operaciones")]
-public sealed class OperacionesController(IOperacionService service) : ControllerBase
+public sealed class OperacionesController(
+    IOperacionService service,
+    IOperacionTalHorizontalV2Service talHorizontalV2Service,
+    IOperacionCarguioV2Service carguioV2Service) : ControllerBase
 {
+    private static bool UsaTalHorizontalV2(string tipo) =>
+        string.Equals(tipo, "tal_horizontal", StringComparison.OrdinalIgnoreCase);
+
+    private static bool UsaCarguioV2(string tipo) =>
+        string.Equals(tipo, "carguio", StringComparison.OrdinalIgnoreCase);
+
     [HttpPost("crear")]
     [AllowAnonymous]
     public async Task<ActionResult> Crear([FromBody] JsonElement body, CancellationToken ct)
@@ -31,7 +41,11 @@ public sealed class OperacionesController(IOperacionService service) : Controlle
     {
         try
         {
-            var result = await service.GetAllAsync(tipo, estado, envio, ct);
+            var result = UsaTalHorizontalV2(tipo)
+                ? await talHorizontalV2Service.GetAllAsync(estado, envio, ct)
+                : UsaCarguioV2(tipo)
+                    ? await carguioV2Service.GetAllAsync(estado, envio, ct)
+                    : await service.GetAllAsync(tipo, estado, envio, ct);
             return Ok(new { ok = true, data = result });
         }
         catch (ArgumentException ex)
@@ -45,7 +59,11 @@ public sealed class OperacionesController(IOperacionService service) : Controlle
     {
         try
         {
-            var result = await service.GetByAprobacionAsync(tipo, estado, envio, ct);
+            var result = UsaTalHorizontalV2(tipo)
+                ? await talHorizontalV2Service.GetByAprobacionAsync(estado, envio, ct)
+                : UsaCarguioV2(tipo)
+                    ? await carguioV2Service.GetByAprobacionAsync(estado, envio, ct)
+                    : await service.GetByAprobacionAsync(tipo, estado, envio, ct);
             return Ok(new { ok = true, data = result });
         }
         catch (ArgumentException ex)
@@ -74,7 +92,11 @@ public sealed class OperacionesController(IOperacionService service) : Controlle
 
         try
         {
-            var result = await service.GetByJefeAsync(tipo, jefe_guardia, limit, offset, ct);
+            var result = UsaTalHorizontalV2(tipo)
+                ? await talHorizontalV2Service.GetByJefeAsync(jefe_guardia, limit, offset, ct)
+                : UsaCarguioV2(tipo)
+                    ? await carguioV2Service.GetByJefeAsync(jefe_guardia, limit, offset, ct)
+                    : await service.GetByJefeAsync(tipo, jefe_guardia, limit, offset, ct);
             return Ok(new { ok = true, data = result });
         }
         catch (ArgumentException ex)
@@ -88,7 +110,11 @@ public sealed class OperacionesController(IOperacionService service) : Controlle
     {
         try
         {
-            var result = await service.GetByIdAsync(tipo, id, ct);
+            var result = UsaTalHorizontalV2(tipo)
+                ? await talHorizontalV2Service.GetByIdAsync(id, ct)
+                : UsaCarguioV2(tipo)
+                    ? await carguioV2Service.GetByIdAsync(id, ct)
+                    : await service.GetByIdAsync(tipo, id, ct);
             if (result is null)
                 return NotFound(new { ok = false, error = "Registro no encontrado" });
             return Ok(new { ok = true, data = result });

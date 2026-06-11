@@ -3,24 +3,24 @@ using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Seminco.Application.Operaciones;
 using Seminco.Application.OperacionesV2;
-using Seminco.Domain.Catalogs;
 using Seminco.Domain.OperacionesV2;
 using Seminco.Infrastructure.Persistence;
 
 namespace Seminco.Infrastructure.OperacionesV2;
 
-public sealed class OperacionTalHorizontalV2Service(SemincoDbContext db) : IOperacionTalHorizontalV2Service
+public sealed class OperacionCarguioV2Service(SemincoDbContext db) : IOperacionCarguioV2Service
 {
-    private const string TipoOperacion = "tal_horizontal";
-    private const string ProcesoChecklist = "PERFORACIÓN HORIZONTAL";
-    private const string ProcesoEstado = "PERFORACIÓN HORIZONTAL";
-    private const string ProcesoSeccion = "PERFORACIÓN HORIZONTAL";
+    private const string TipoOperacion = "carguio";
+    private const string ProcesoChecklist = "SCOOPTRAM";
+    private const string ProcesoEstado = "SCOOPTRAM";
+    private const string ProcesoSeccion = "SCOOPTRAM";
     private static readonly JsonSerializerOptions JsonOptions = new() { PropertyNameCaseInsensitive = true };
 
-    private IQueryable<OperacionTalHorizontal> ReadQuery() => db.OperacionesTalHorizontalV2
+    private IQueryable<Domain.OperacionesV2.OperacionCarguio> ReadQuery() => db.OperacionesCarguioV2
         .AsNoTracking()
         .AsSplitQuery()
         .Include(x => x.CondicionEquipo)
+        .Include(x => x.ProgramaTrabajo)
         .Include(x => x.Horometros)
         .Include(x => x.ChecklistRespuestas)
         .Include(x => x.ControlLlantas)
@@ -74,12 +74,12 @@ public sealed class OperacionTalHorizontalV2Service(SemincoDbContext db) : IOper
         return entities.Select(MapToDto).ToList();
     }
 
-    public async Task<OperacionTalHorizontalV2ResponseDto> CreateAsync(JsonElement body, CancellationToken ct)
+    public async Task<OperacionCarguioV2ResponseDto> CreateAsync(JsonElement body, CancellationToken ct)
     {
         var request = Deserialize(body);
         var now = DateTime.UtcNow;
 
-        var entity = new OperacionTalHorizontal
+        var entity = new Domain.OperacionesV2.OperacionCarguio
         {
             CreatedAt = now,
             UpdatedAt = now,
@@ -87,16 +87,17 @@ public sealed class OperacionTalHorizontalV2Service(SemincoDbContext db) : IOper
 
         await ApplyRequestAsync(entity, request, body.GetRawText(), ct, isUpdate: false);
 
-        db.OperacionesTalHorizontalV2.Add(entity);
+        db.OperacionesCarguioV2.Add(entity);
         await db.SaveChangesAsync(ct);
 
-        return new OperacionTalHorizontalV2ResponseDto(entity.Id, "Operación tal_horizontal V2 creada correctamente");
+        return new OperacionCarguioV2ResponseDto(entity.Id, "Operación carguio V2 creada correctamente");
     }
 
-    public async Task<OperacionTalHorizontalV2ResponseDto?> UpdateAsync(int id, JsonElement body, CancellationToken ct)
+    public async Task<OperacionCarguioV2ResponseDto?> UpdateAsync(int id, JsonElement body, CancellationToken ct)
     {
-        var entity = await db.OperacionesTalHorizontalV2
+        var entity = await db.OperacionesCarguioV2
             .Include(x => x.CondicionEquipo)
+            .Include(x => x.ProgramaTrabajo)
             .Include(x => x.Horometros)
             .Include(x => x.ChecklistRespuestas)
             .Include(x => x.ControlLlantas)
@@ -110,10 +111,10 @@ public sealed class OperacionTalHorizontalV2Service(SemincoDbContext db) : IOper
         await ApplyRequestAsync(entity, request, body.GetRawText(), ct, isUpdate: true);
         await db.SaveChangesAsync(ct);
 
-        return new OperacionTalHorizontalV2ResponseDto(entity.Id, "Operación tal_horizontal V2 actualizada correctamente");
+        return new OperacionCarguioV2ResponseDto(entity.Id, "Operación carguio V2 actualizada correctamente");
     }
 
-    private async Task ApplyRequestAsync(OperacionTalHorizontal entity, OperacionTalHorizontalUpsertRequest request, string rawPayload, CancellationToken ct, bool isUpdate)
+    private async Task ApplyRequestAsync(Domain.OperacionesV2.OperacionCarguio entity, OperacionCarguioUpsertRequest request, string rawPayload, CancellationToken ct, bool isUpdate)
     {
         entity.Fecha = ParseFecha(request.Fecha);
         entity.Turno = request.Turno;
@@ -123,7 +124,9 @@ public sealed class OperacionTalHorizontalV2Service(SemincoDbContext db) : IOper
         entity.NEquipo = request.NEquipo;
         entity.Seccion = request.Seccion;
         entity.SeccionId = await ResolveSeccionIdAsync(request.Seccion, ct);
-        entity.ModeloEquipo = request.ModeloEquipo;
+        entity.Capacidad = request.Capacidad;
+        entity.TipoEquipoDiesel = request.TipoEquipo?.Diesel;
+        entity.TipoEquipoElectrico = request.TipoEquipo?.Electrico;
         entity.Estado = string.IsNullOrWhiteSpace(request.Estado) ? "activo" : request.Estado;
         entity.Envio = request.Envio ?? 0;
         entity.Revisado = request.Revisado ?? 0;
@@ -138,11 +141,13 @@ public sealed class OperacionTalHorizontalV2Service(SemincoDbContext db) : IOper
         if (isUpdate)
         {
             if (entity.CondicionEquipo is not null) db.Remove(entity.CondicionEquipo);
+            if (entity.ProgramaTrabajo is not null) db.Remove(entity.ProgramaTrabajo);
             if (entity.Horometros.Count > 0) db.RemoveRange(entity.Horometros);
             if (entity.ChecklistRespuestas.Count > 0) db.RemoveRange(entity.ChecklistRespuestas);
             if (entity.ControlLlantas.Count > 0) db.RemoveRange(entity.ControlLlantas);
             if (entity.Registros.Count > 0) db.RemoveRange(entity.Registros);
             entity.CondicionEquipo = null;
+            entity.ProgramaTrabajo = null;
             entity.Horometros.Clear();
             entity.ChecklistRespuestas.Clear();
             entity.ControlLlantas.Clear();
@@ -152,13 +157,14 @@ public sealed class OperacionTalHorizontalV2Service(SemincoDbContext db) : IOper
         entity.Horometros = BuildHorometros(request.Horometros);
         entity.CondicionEquipo = BuildCondicionEquipo(request.CondicionesEquipo);
         entity.ControlLlantas = BuildControlLlantas(request.ControlLlantas);
+        entity.ProgramaTrabajo = BuildProgramaTrabajo(request.ProgramaTrabajo);
         entity.ChecklistRespuestas = await BuildChecklistAsync(request.CheckList, ct);
         entity.Registros = await BuildRegistrosAsync(request.Registros, ct);
     }
 
-    private static OperacionTalHorizontalUpsertRequest Deserialize(JsonElement body) =>
-        JsonSerializer.Deserialize<OperacionTalHorizontalUpsertRequest>(body.GetRawText(), JsonOptions)
-        ?? throw new InvalidOperationException("No se pudo deserializar la operación tal_horizontal V2");
+    private static OperacionCarguioUpsertRequest Deserialize(JsonElement body) =>
+        JsonSerializer.Deserialize<OperacionCarguioUpsertRequest>(body.GetRawText(), JsonOptions)
+        ?? throw new InvalidOperationException("No se pudo deserializar la operación carguio V2");
 
     private static JsonElement? ParseJson(string? value)
     {
@@ -173,26 +179,20 @@ public sealed class OperacionTalHorizontalV2Service(SemincoDbContext db) : IOper
         return JsonSerializer.SerializeToElement(value, JsonOptions);
     }
 
-    private static RegistroOperacionDetalleRequest EmptyRegistroOperacion() =>
-        new(null, null, null, null, null, null, null, null, null, null, null, null, null);
+    private static OperacionCarguioRegistroDetalleRequest EmptyRegistroOperacion() =>
+        new(null, null, null, null, null, null, null);
 
-    private static RegistroOperacionDetalleRequest BuildRegistroOperacion(OperacionTalHorizontalRegistro registro)
+    private static OperacionCarguioRegistroDetalleRequest BuildRegistroOperacion(Domain.OperacionesV2.OperacionCarguioRegistro registro)
     {
         if (registro.Detalle is not null)
         {
-            return new RegistroOperacionDetalleRequest(
-                registro.Detalle.Nivel,
-                registro.Detalle.TipoLabor,
-                registro.Detalle.Labor,
-                registro.Detalle.Ala,
-                registro.Detalle.TalProd?.ToString(CultureInfo.InvariantCulture),
-                registro.Detalle.TalRimados?.ToString(CultureInfo.InvariantCulture),
-                registro.Detalle.TalAlivio?.ToString(CultureInfo.InvariantCulture),
-                registro.Detalle.TalRepaso?.ToString(CultureInfo.InvariantCulture),
-                registro.Detalle.LongBarras?.ToString(CultureInfo.InvariantCulture),
-                registro.Detalle.NumBarras?.ToString(CultureInfo.InvariantCulture),
-                registro.Detalle.TipoPerforacion,
-                registro.Detalle.TipoPerforacionId,
+            return new OperacionCarguioRegistroDetalleRequest(
+                registro.Detalle.NivelInicio,
+                registro.Detalle.TipoLaborInicio,
+                registro.Detalle.LaborInicio,
+                registro.Detalle.AlaInicio,
+                registro.Detalle.UbicacionDestino,
+                registro.Detalle.NCucharas,
                 registro.Detalle.Observaciones);
         }
 
@@ -200,7 +200,7 @@ public sealed class OperacionTalHorizontalV2Service(SemincoDbContext db) : IOper
         {
             try
             {
-                return JsonSerializer.Deserialize<RegistroOperacionDetalleRequest>(registro.PayloadOperacion, JsonOptions)
+                return JsonSerializer.Deserialize<OperacionCarguioRegistroDetalleRequest>(registro.PayloadOperacion, JsonOptions)
                     ?? EmptyRegistroOperacion();
             }
             catch
@@ -211,17 +211,19 @@ public sealed class OperacionTalHorizontalV2Service(SemincoDbContext db) : IOper
         return EmptyRegistroOperacion();
     }
 
-    private static OperacionDto MapToDto(OperacionTalHorizontal entity)
+    private static OperacionDto MapToDto(Domain.OperacionesV2.OperacionCarguio entity)
     {
         var horometros = entity.Horometros.Count == 0
             ? null
-            : ToJsonElement(entity.Horometros.ToDictionary(
-                x => x.Tipo,
-                x => new HorometroDetalleRequest(x.Inicio, x.Final, x.Op, x.Inop)));
+            : ToJsonElement(new OperacionCarguioHorometrosRequest(
+                entity.Horometros
+                    .Where(x => string.Equals(x.Tipo, "horometro", StringComparison.OrdinalIgnoreCase))
+                    .Select(x => new OperacionCarguioHorometroDetalleRequest(x.Inicio, x.Final, x.Op, x.Inop))
+                    .FirstOrDefault()));
 
         var condicionEquipo = entity.CondicionEquipo is null
             ? null
-            : ToJsonElement(new CondicionEquipoRequest(
+            : ToJsonElement(new OperacionCarguioCondicionEquipoRequest(
                 entity.CondicionEquipo.Op,
                 entity.CondicionEquipo.NoOp,
                 entity.CondicionEquipo.Lugar,
@@ -236,7 +238,7 @@ public sealed class OperacionTalHorizontalV2Service(SemincoDbContext db) : IOper
             ? null
             : ToJsonElement(entity.ChecklistRespuestas
                 .OrderBy(x => x.Id)
-                .Select(x => new ChecklistRespuestaRequest(
+                .Select(x => new OperacionCarguioChecklistRespuestaRequest(
                     x.DescripcionSnapshot,
                     x.Decision,
                     x.Observacion,
@@ -245,17 +247,23 @@ public sealed class OperacionTalHorizontalV2Service(SemincoDbContext db) : IOper
 
         var controlLlantas = entity.ControlLlantas.Count == 0
             ? null
-            : ToJsonElement(new ControlLlantasRequest(
+            : ToJsonElement(new OperacionCarguioControlLlantasRequest(
                 entity.ControlLlantas.FirstOrDefault(x => x.Posicion == 1)?.Estado,
                 entity.ControlLlantas.FirstOrDefault(x => x.Posicion == 2)?.Estado,
                 entity.ControlLlantas.FirstOrDefault(x => x.Posicion == 3)?.Estado,
                 entity.ControlLlantas.FirstOrDefault(x => x.Posicion == 4)?.Estado));
 
+        var programaTrabajo = entity.ProgramaTrabajo is null
+            ? null
+            : ToJsonElement(new OperacionCarguioProgramaTrabajoRequest(
+                entity.ProgramaTrabajo.NCucharasProgramado,
+                entity.ProgramaTrabajo.NCucharasRealizado));
+
         var registros = entity.Registros.Count == 0
             ? null
             : ToJsonElement(entity.Registros
                 .OrderBy(x => x.Id)
-                .Select(x => new RegistroRequest(
+                .Select(x => new OperacionCarguioRegistroRequest(
                     x.ExternalId,
                     x.Numero,
                     x.EstadoPrincipal,
@@ -264,6 +272,12 @@ public sealed class OperacionTalHorizontalV2Service(SemincoDbContext db) : IOper
                     x.HoraFinal.ToString("HH:mm:ss", CultureInfo.InvariantCulture),
                     BuildRegistroOperacion(x)))
                 .ToList());
+
+        var tipoEquipo = entity.TipoEquipoDiesel is null && entity.TipoEquipoElectrico is null
+            ? null
+            : JsonSerializer.Serialize(new OperacionCarguioTipoEquipoRequest(
+                entity.TipoEquipoDiesel ?? false,
+                entity.TipoEquipoElectrico ?? false));
 
         return new OperacionDto(
             entity.Id,
@@ -275,10 +289,10 @@ public sealed class OperacionTalHorizontalV2Service(SemincoDbContext db) : IOper
             entity.JefeGuardia,
             entity.EquipoNombre,
             entity.NEquipo,
-            entity.ModeloEquipo,
             null,
-            null,
-            null,
+            entity.Capacidad,
+            tipoEquipo,
+            programaTrabajo,
             null,
             registros,
             horometros,
@@ -348,40 +362,28 @@ public sealed class OperacionTalHorizontalV2Service(SemincoDbContext db) : IOper
         throw new InvalidOperationException($"Hora inválida en {fieldName}: {value}");
     }
 
-    private static decimal? ParseDecimal(string? value)
+    private static List<OperacionCarguioHorometro> BuildHorometros(OperacionCarguioHorometrosRequest? request)
     {
-        if (string.IsNullOrWhiteSpace(value)) return null;
-        return decimal.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out var parsed)
-            ? parsed
-            : null;
-    }
+        var detalle = request?.Horometro;
+        if (detalle is null) return [];
 
-    private static List<OperacionTalHorizontalHorometro> BuildHorometros(HorometrosRequest? request)
-    {
-        var result = new List<OperacionTalHorizontalHorometro>();
-        AddIfPresent("diesel", request?.Diesel);
-        AddIfPresent("electrico", request?.Electrico);
-        AddIfPresent("percusion", request?.Percusion);
-        return result;
-
-        void AddIfPresent(string tipo, HorometroDetalleRequest? detalle)
-        {
-            if (detalle is null) return;
-            result.Add(new OperacionTalHorizontalHorometro
+        return
+        [
+            new OperacionCarguioHorometro
             {
-                Tipo = tipo,
+                Tipo = "horometro",
                 Inicio = detalle.Inicio,
                 Final = detalle.Final,
                 Op = detalle.Op,
                 Inop = detalle.Inop,
-            });
-        }
+            }
+        ];
     }
 
-    private static OperacionTalHorizontalCondicionEquipo? BuildCondicionEquipo(CondicionEquipoRequest? request)
+    private static OperacionCarguioCondicionEquipo? BuildCondicionEquipo(OperacionCarguioCondicionEquipoRequest? request)
     {
         if (request is null) return null;
-        return new OperacionTalHorizontalCondicionEquipo
+        return new OperacionCarguioCondicionEquipo
         {
             Op = request.Op,
             NoOp = request.NoOp,
@@ -395,7 +397,18 @@ public sealed class OperacionTalHorizontalV2Service(SemincoDbContext db) : IOper
         };
     }
 
-    private static List<OperacionTalHorizontalControlLlanta> BuildControlLlantas(ControlLlantasRequest? request)
+    private static OperacionCarguioProgramaTrabajo? BuildProgramaTrabajo(OperacionCarguioProgramaTrabajoRequest? request)
+    {
+        if (request is null) return null;
+
+        return new OperacionCarguioProgramaTrabajo
+        {
+            NCucharasProgramado = request.NCucharasProgramado,
+            NCucharasRealizado = request.NCucharasRealizado,
+        };
+    }
+
+    private static List<OperacionCarguioControlLlanta> BuildControlLlantas(OperacionCarguioControlLlantasRequest? request)
     {
         if (request is null) return [];
         return
@@ -407,7 +420,7 @@ public sealed class OperacionTalHorizontalV2Service(SemincoDbContext db) : IOper
         ];
     }
 
-    private async Task<List<OperacionTalHorizontalChecklistRespuesta>> BuildChecklistAsync(List<ChecklistRespuestaRequest>? request, CancellationToken ct)
+    private async Task<List<OperacionCarguioChecklistRespuesta>> BuildChecklistAsync(List<OperacionCarguioChecklistRespuestaRequest>? request, CancellationToken ct)
     {
         if (request is null || request.Count == 0) return [];
 
@@ -421,7 +434,7 @@ public sealed class OperacionTalHorizontalV2Service(SemincoDbContext db) : IOper
                 string.Equals(c.Categoria?.Trim(), item.Categoria.Trim(), StringComparison.OrdinalIgnoreCase) &&
                 string.Equals(c.Nombre?.Trim(), item.Descripcion.Trim(), StringComparison.OrdinalIgnoreCase));
 
-            return new OperacionTalHorizontalChecklistRespuesta
+            return new OperacionCarguioChecklistRespuesta
             {
                 ChecklistItemId = matched?.Id,
                 CategoriaSnapshot = item.Categoria,
@@ -432,7 +445,7 @@ public sealed class OperacionTalHorizontalV2Service(SemincoDbContext db) : IOper
         }).ToList();
     }
 
-    private async Task<List<OperacionTalHorizontalRegistro>> BuildRegistrosAsync(List<RegistroRequest>? request, CancellationToken ct)
+    private async Task<List<OperacionCarguioRegistro>> BuildRegistrosAsync(List<OperacionCarguioRegistroRequest>? request, CancellationToken ct)
     {
         if (request is null || request.Count == 0) return [];
 
@@ -445,9 +458,10 @@ public sealed class OperacionTalHorizontalV2Service(SemincoDbContext db) : IOper
         {
             var estado = estados.FirstOrDefault(x =>
                 string.Equals(x.Codigo, item.Codigo, StringComparison.OrdinalIgnoreCase));
+            var detalle = item.Operacion ?? EmptyRegistroOperacion();
             var esOperativo = string.Equals(item.Estado?.Trim(), "OPERATIVO", StringComparison.OrdinalIgnoreCase);
 
-            return new OperacionTalHorizontalRegistro
+            return new OperacionCarguioRegistro
             {
                 ExternalId = item.Id,
                 Numero = item.Numero,
@@ -456,25 +470,19 @@ public sealed class OperacionTalHorizontalV2Service(SemincoDbContext db) : IOper
                 EstadoCatalogoId = estado?.Id,
                 HoraInicio = ParseHoraRequired(item.HoraInicio, nameof(item.HoraInicio)),
                 HoraFinal = ParseHoraRequired(item.HoraFinal, nameof(item.HoraFinal)),
-                PayloadOperacion = JsonSerializer.Serialize(item.Operacion, JsonOptions),
+                PayloadOperacion = JsonSerializer.Serialize(detalle, JsonOptions),
                 CreatedAt = now,
                 UpdatedAt = now,
                 Detalle = esOperativo
-                    ? new OperacionTalHorizontalRegistroDetalle
+                    ? new OperacionCarguioRegistroDetalle
                     {
-                        Nivel = item.Operacion.Nivel,
-                        TipoLabor = item.Operacion.TipoLabor,
-                        Labor = item.Operacion.Labor,
-                        Ala = item.Operacion.Ala,
-                        TalProd = ParseDecimal(item.Operacion.TalProd),
-                        TalRimados = ParseDecimal(item.Operacion.TalRimados),
-                        TalAlivio = ParseDecimal(item.Operacion.TalAlivio),
-                        TalRepaso = ParseDecimal(item.Operacion.TalRepaso),
-                        LongBarras = ParseDecimal(item.Operacion.LongBarras),
-                        NumBarras = ParseDecimal(item.Operacion.NumBarras),
-                        TipoPerforacion = item.Operacion.TipoPerforacion,
-                        TipoPerforacionId = item.Operacion.TipoPerforacionId,
-                        Observaciones = item.Operacion.Observaciones,
+                        NivelInicio = detalle.NivelInicio,
+                        TipoLaborInicio = detalle.TipoLaborInicio,
+                        LaborInicio = detalle.LaborInicio,
+                        AlaInicio = detalle.AlaInicio,
+                        UbicacionDestino = detalle.UbicacionDestino,
+                        NCucharas = detalle.NCucharas,
+                        Observaciones = detalle.Observaciones,
                     }
                     : null
             };

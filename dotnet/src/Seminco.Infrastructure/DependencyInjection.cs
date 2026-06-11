@@ -58,6 +58,7 @@ public static class DependencyInjection
         services.AddSingleton<IJwtTokenIssuer, JwtTokenIssuer>();
         services.AddScoped<IOperacionService, OperacionService>();
         services.AddScoped<IOperacionTalHorizontalV2Service, OperacionTalHorizontalV2Service>();
+        services.AddScoped<IOperacionCarguioV2Service, OperacionCarguioV2Service>();
         services.AddScoped<INubeExploracionService, NubeExploracionService>();
         services.AddScoped<IMedicionHorizontalService, MedicionHorizontalService>();
 
