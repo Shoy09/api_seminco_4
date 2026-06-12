@@ -14,6 +14,9 @@ public abstract class CatalogService<TEntity, TDto>(SemincoDbContext db) : ICata
     protected abstract TEntity ToEntity(TDto dto);
     protected abstract void ApplyUpdate(TEntity entity, TDto dto);
 
+    public virtual Task<List<TDto>> GetByProcesoAsync(string proceso, CancellationToken ct) =>
+        throw new NotSupportedException($"Catalog '{GetType().Name}' does not support filtering by proceso.");
+
     public async Task<List<TDto>> GetAllAsync(CancellationToken ct)
     {
         var entities = await Db.Set<TEntity>().AsNoTracking().ToListAsync(ct);

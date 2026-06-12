@@ -174,7 +174,7 @@ public sealed class OperacionTalHorizontalV2Service(SemincoDbContext db) : IOper
     }
 
     private static RegistroOperacionDetalleRequest EmptyRegistroOperacion() =>
-        new(null, null, null, null, null, null, null, null, null, null, null, null, null);
+        new(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
 
     private static RegistroOperacionDetalleRequest BuildRegistroOperacion(OperacionTalHorizontalRegistro registro)
     {
@@ -191,6 +191,14 @@ public sealed class OperacionTalHorizontalV2Service(SemincoDbContext db) : IOper
                 registro.Detalle.TalRepaso?.ToString(CultureInfo.InvariantCulture),
                 registro.Detalle.LongBarras?.ToString(CultureInfo.InvariantCulture),
                 registro.Detalle.NumBarras?.ToString(CultureInfo.InvariantCulture),
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
                 registro.Detalle.TipoPerforacion,
                 registro.Detalle.TipoPerforacionId,
                 registro.Detalle.Observaciones);

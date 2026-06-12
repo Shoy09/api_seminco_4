@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using Seminco.Application.Catalogs;
 using Seminco.Domain.Catalogs;
 using Seminco.Infrastructure.Persistence;
@@ -23,6 +24,13 @@ public sealed class TipoPerforacionService(SemincoDbContext db) : CatalogService
     protected override TipoPerforacionDto ToDto(TipoPerforacion e) => new(e.Id, e.Nombre, e.Proceso, e.PermitidoMedicion);
     protected override TipoPerforacion ToEntity(TipoPerforacionDto dto) => new() { Nombre = dto.Nombre, Proceso = dto.Proceso, PermitidoMedicion = dto.PermitidoMedicion };
     protected override void ApplyUpdate(TipoPerforacion entity, TipoPerforacionDto dto) { entity.Nombre = dto.Nombre; entity.Proceso = dto.Proceso; entity.PermitidoMedicion = dto.PermitidoMedicion; }
+    public override async Task<List<TipoPerforacionDto>> GetByProcesoAsync(string proceso, CancellationToken ct)
+    {
+        var entities = await Db.Set<TipoPerforacion>().AsNoTracking()
+            .Where(e => e.Proceso == proceso)
+            .ToListAsync(ct);
+        return entities.Select(ToDto).ToList();
+    }
 }
 
 public sealed class TipoEquipoService(SemincoDbContext db) : CatalogService<TipoEquipo, TipoEquipoDto>(db)

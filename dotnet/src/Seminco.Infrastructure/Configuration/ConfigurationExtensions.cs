@@ -10,7 +10,8 @@ public static class ConfigurationExtensions
         Port = int.TryParse(Get(configuration, "Database:Port", "DB_PORT"), out var port) ? port : 5432,
         Name = Get(configuration, "Database:Name", "DB_NAME"),
         User = Get(configuration, "Database:User", "DB_USER"),
-        Password = Get(configuration, "Database:Password", "DB_PASSWORD")
+        Password = Get(configuration, "Database:Password", "DB_PASSWORD"),
+        Schema = Get(configuration, "Database:Schema", "DB_SCHEMA")
     };
 
     public static JwtOptions GetJwtOptions(this IConfiguration configuration) => new()

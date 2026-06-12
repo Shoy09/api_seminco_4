@@ -1,5 +1,7 @@
 BEGIN;
 
+SET LOCAL search_path TO bwqpru6uszd4olgimtbh, public;
+
 CREATE TEMP TABLE tmp_otlv2_map (legacy_id integer PRIMARY KEY, new_id integer NOT NULL) ON COMMIT DROP;
 
 INSERT INTO tmp_otlv2_map (legacy_id, new_id)
@@ -67,16 +69,46 @@ WITH registros_source AS (
     FROM registros_source s LEFT JOIN estados e ON e.proceso = 'PERFORACIÓN TALADROS LARGOS' AND lower(trim(e.codigo)) = lower(trim(COALESCE(s.registro->>'codigo', '')))
     ORDER BY s.operacion_id, s.source_ordinal RETURNING id, operacion_id, estado_principal
 ), source_with_ordinal AS (
-    SELECT m.new_id AS operacion_id, t.item->'operacion' AS op, t.ordinality AS source_ordinal
-    FROM "Operacion_tal_largo" o JOIN tmp_otlv2_map m ON m.legacy_id = o.id CROSS JOIN LATERAL jsonb_array_elements(COALESCE(NULLIF(o.registros, ''), '[]')::jsonb) WITH ORDINALITY AS t(item, ordinality)
-    WHERE upper(trim(COALESCE(t.item->>'estado', ''))) = 'OPERATIVO'
+    SELECT m.new_id AS operacion_id,
+           t.item->'operacion' AS op,
+           t.ordinality AS source_ordinal,
+           upper(trim(COALESCE(t.item->>'estado', ''))) AS estado_principal,
+           COALESCE(NULLIF(t.item->'operacion'->>'tipo_perforacion_id', '')::integer, tp.id) AS tipo_perforacion_id
+    FROM "Operacion_tal_largo" o
+    JOIN tmp_otlv2_map m ON m.legacy_id = o.id
+    CROSS JOIN LATERAL jsonb_array_elements(COALESCE(NULLIF(o.registros, ''), '[]')::jsonb) WITH ORDINALITY AS t(item, ordinality)
+    LEFT JOIN tipo_perforaciones tp ON lower(trim(tp.nombre)) = lower(trim(t.item->'operacion'->>'tipo_perforacion'))
 ), inserted_with_ordinal AS (
-    SELECT r.id, r.operacion_id, row_number() OVER (PARTITION BY r.operacion_id ORDER BY r.id) AS source_ordinal FROM registros_inserted r WHERE upper(trim(COALESCE(r.estado_principal, ''))) = 'OPERATIVO'
+    SELECT r.id,
+           r.operacion_id,
+           row_number() OVER (PARTITION BY r.operacion_id ORDER BY r.id) AS source_ordinal,
+           upper(trim(COALESCE(r.estado_principal, ''))) AS estado_principal
+    FROM registros_inserted r
 )
-INSERT INTO operacion_tal_largo_registro_detalle (registro_id, nivel, tipo_labor, labor, ala, tal_prod, tal_rimados, tal_alivio, tal_repaso, long_barras, num_barras, tipo_perforacion, observaciones)
-SELECT DISTINCT ON (ri.id) ri.id, NULLIF(src.op->>'nivel', ''), NULLIF(src.op->>'tipo_labor', ''), NULLIF(src.op->>'labor', ''), NULLIF(src.op->>'ala', ''), NULLIF(src.op->>'tal_prod', '')::numeric(10,2), NULLIF(src.op->>'tal_rimados', '')::numeric(10,2), NULLIF(src.op->>'tal_alivio', '')::numeric(10,2), NULLIF(src.op->>'tal_repaso', '')::numeric(10,2), NULLIF(src.op->>'long_barras', '')::numeric(10,2), NULLIF(src.op->>'num_barras', '')::numeric(10,2), NULLIF(src.op->>'tipo_perforacion', ''), NULLIF(src.op->>'observaciones', '')
-FROM source_with_ordinal src JOIN inserted_with_ordinal ri ON ri.operacion_id = src.operacion_id AND ri.source_ordinal = src.source_ordinal
+INSERT INTO operacion_tal_largo_registro_detalle (registro_id, nivel, tipo_labor, labor, ala, n_taladros_produccion, metros_perforados_produccion, n_taladros_rimados, metros_perforados_rimados, n_taladros_alivio, metros_perforados_alivio, n_taladros_repaso, metros_perforados_repaso, long_barras, num_barras, tipo_perforacion, tipo_perforacion_id, observaciones)
+SELECT DISTINCT ON (ri.id)
+       ri.id,
+       NULLIF(src.op->>'nivel', ''),
+       NULLIF(src.op->>'tipo_labor', ''),
+       NULLIF(src.op->>'labor', ''),
+       NULLIF(src.op->>'ala', ''),
+       COALESCE(NULLIF(src.op->>'n_taladros_produccion', ''), NULLIF(src.op->>'tal_prod', '')),
+       COALESCE(NULLIF(src.op->>'metros_perforados_produccion', '')::numeric(10,2), NULLIF(src.op->>'tal_prod', '')::numeric(10,2)),
+       COALESCE(NULLIF(src.op->>'n_taladros_rimados', ''), NULLIF(src.op->>'tal_rimados', '')),
+       COALESCE(NULLIF(src.op->>'metros_perforados_rimados', '')::numeric(10,2), NULLIF(src.op->>'tal_rimados', '')::numeric(10,2)),
+       COALESCE(NULLIF(src.op->>'n_taladros_alivio', ''), NULLIF(src.op->>'tal_alivio', '')),
+       COALESCE(NULLIF(src.op->>'metros_perforados_alivio', '')::numeric(10,2), NULLIF(src.op->>'tal_alivio', '')::numeric(10,2)),
+       COALESCE(NULLIF(src.op->>'n_taladros_repaso', ''), NULLIF(src.op->>'tal_repaso', '')),
+       COALESCE(NULLIF(src.op->>'metros_perforados_repaso', '')::numeric(10,2), NULLIF(src.op->>'tal_repaso', '')::numeric(10,2)),
+       NULLIF(src.op->>'long_barras', ''),
+       NULLIF(src.op->>'num_barras', ''),
+       NULLIF(src.op->>'tipo_perforacion', ''),
+       src.tipo_perforacion_id,
+       NULLIF(src.op->>'observaciones', '')
+FROM source_with_ordinal src
+JOIN inserted_with_ordinal ri ON ri.operacion_id = src.operacion_id AND ri.source_ordinal = src.source_ordinal
+WHERE src.estado_principal = 'OPERATIVO' AND ri.estado_principal = 'OPERATIVO'
 ORDER BY ri.id
-ON CONFLICT (registro_id) DO UPDATE SET nivel = EXCLUDED.nivel, tipo_labor = EXCLUDED.tipo_labor, labor = EXCLUDED.labor, ala = EXCLUDED.ala, tal_prod = EXCLUDED.tal_prod, tal_rimados = EXCLUDED.tal_rimados, tal_alivio = EXCLUDED.tal_alivio, tal_repaso = EXCLUDED.tal_repaso, long_barras = EXCLUDED.long_barras, num_barras = EXCLUDED.num_barras, tipo_perforacion = EXCLUDED.tipo_perforacion, observaciones = EXCLUDED.observaciones;
+ON CONFLICT (registro_id) DO UPDATE SET nivel = EXCLUDED.nivel, tipo_labor = EXCLUDED.tipo_labor, labor = EXCLUDED.labor, ala = EXCLUDED.ala, n_taladros_produccion = EXCLUDED.n_taladros_produccion, metros_perforados_produccion = EXCLUDED.metros_perforados_produccion, n_taladros_rimados = EXCLUDED.n_taladros_rimados, metros_perforados_rimados = EXCLUDED.metros_perforados_rimados, n_taladros_alivio = EXCLUDED.n_taladros_alivio, metros_perforados_alivio = EXCLUDED.metros_perforados_alivio, n_taladros_repaso = EXCLUDED.n_taladros_repaso, metros_perforados_repaso = EXCLUDED.metros_perforados_repaso, long_barras = EXCLUDED.long_barras, num_barras = EXCLUDED.num_barras, tipo_perforacion = EXCLUDED.tipo_perforacion, tipo_perforacion_id = EXCLUDED.tipo_perforacion_id, observaciones = EXCLUDED.observaciones;
 
 COMMIT;

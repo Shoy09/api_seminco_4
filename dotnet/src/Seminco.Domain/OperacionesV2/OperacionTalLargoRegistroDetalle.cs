@@ -7,12 +7,16 @@ public sealed class OperacionTalLargoRegistroDetalle
     public string? TipoLabor { get; set; }
     public string? Labor { get; set; }
     public string? Ala { get; set; }
-    public decimal? TalProd { get; set; }
-    public decimal? TalRimados { get; set; }
-    public decimal? TalAlivio { get; set; }
-    public decimal? TalRepaso { get; set; }
-    public decimal? LongBarras { get; set; }
-    public decimal? NumBarras { get; set; }
+    public string? NTaladrosProduccion { get; set; }
+    public decimal? MetrosPerforadosProduccion { get; set; }
+    public string? NTaladrosRimados { get; set; }
+    public decimal? MetrosPerforadosRimados { get; set; }
+    public string? NTaladrosAlivio { get; set; }
+    public decimal? MetrosPerforadosAlivio { get; set; }
+    public string? NTaladrosRepaso { get; set; }
+    public decimal? MetrosPerforadosRepaso { get; set; }
+    public string? LongBarras { get; set; }
+    public string? NumBarras { get; set; }
     public string? TipoPerforacion { get; set; }
     public int? TipoPerforacionId { get; set; }
     public string? Observaciones { get; set; }

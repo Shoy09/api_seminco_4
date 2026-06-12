@@ -1,3 +1,7 @@
+BEGIN;
+
+SET LOCAL search_path TO bwqpru6uszd4olgimtbh, public;
+
 -- Ajusta este valor si en checklist_items.proceso usas otro nombre
 -- por ejemplo 'JUMBO' en vez de 'PERFORACIÓN HORIZONTAL'.
 WITH proceso_catalogo AS (
@@ -25,3 +29,5 @@ WHERE r.operacion_id = o.id
 -- WHERE checklist_item_id IS NULL
 -- GROUP BY categoria_snapshot, descripcion_snapshot
 -- ORDER BY categoria_snapshot, descripcion_snapshot;
+
+COMMIT;

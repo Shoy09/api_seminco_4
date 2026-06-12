@@ -3,8 +3,18 @@ using Seminco.Application.Catalogs;
 
 namespace Seminco.Api.Controllers;
 
-[Route("api/TipoPerfpo")]
-public sealed class TipoPerforacionesController(ICatalogService<TipoPerforacionDto> service) : CatalogController<TipoPerforacionDto>(service);
+[Route("api/tipo-perforaciones")]
+public sealed class TipoPerforacionesController(ICatalogService<TipoPerforacionDto> service) : CatalogController<TipoPerforacionDto>(service)
+{
+    [HttpGet("por-proceso")]
+    public async Task<ActionResult<List<TipoPerforacionDto>>> GetByProceso([FromQuery] string proceso, CancellationToken ct)
+    {
+        if (string.IsNullOrWhiteSpace(proceso))
+            return BadRequest(new { message = "El parámetro 'proceso' es requerido." });
+
+        return Ok(await service.GetByProcesoAsync(proceso, ct));
+    }
+}
 
 [Route("api/tipo-equipos")]
 public sealed class TipoEquiposController(ICatalogService<TipoEquipoDto> service) : CatalogController<TipoEquipoDto>(service);

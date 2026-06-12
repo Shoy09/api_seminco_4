@@ -445,7 +445,7 @@ namespace Seminco.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("tipoperforacions", (string)null);
+                    b.ToTable("tipo_perforaciones", (string)null);
                 });
 
             modelBuilder.Entity("Seminco.Domain.Exploraciones.NubeDespacho", b =>
@@ -3362,43 +3362,57 @@ namespace Seminco.Infrastructure.Migrations
                         .HasColumnType("text")
                         .HasColumnName("labor");
 
-                    b.Property<decimal?>("LongBarras")
+                    b.Property<string>("LongBarras")
+                        .HasColumnType("text")
+                        .HasColumnName("long_barras");
+
+                    b.Property<decimal?>("MetrosPerforadosAlivio")
                         .HasPrecision(10, 2)
                         .HasColumnType("numeric(10,2)")
-                        .HasColumnName("long_barras");
+                        .HasColumnName("metros_perforados_alivio");
+
+                    b.Property<decimal?>("MetrosPerforadosProduccion")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("numeric(10,2)")
+                        .HasColumnName("metros_perforados_produccion");
+
+                    b.Property<decimal?>("MetrosPerforadosRepaso")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("numeric(10,2)")
+                        .HasColumnName("metros_perforados_repaso");
+
+                    b.Property<decimal?>("MetrosPerforadosRimados")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("numeric(10,2)")
+                        .HasColumnName("metros_perforados_rimados");
+
+                    b.Property<string>("NTaladrosAlivio")
+                        .HasColumnType("text")
+                        .HasColumnName("n_taladros_alivio");
+
+                    b.Property<string>("NTaladrosProduccion")
+                        .HasColumnType("text")
+                        .HasColumnName("n_taladros_produccion");
+
+                    b.Property<string>("NTaladrosRepaso")
+                        .HasColumnType("text")
+                        .HasColumnName("n_taladros_repaso");
+
+                    b.Property<string>("NTaladrosRimados")
+                        .HasColumnType("text")
+                        .HasColumnName("n_taladros_rimados");
 
                     b.Property<string>("Nivel")
                         .HasColumnType("text")
                         .HasColumnName("nivel");
 
-                    b.Property<decimal?>("NumBarras")
-                        .HasPrecision(10, 2)
-                        .HasColumnType("numeric(10,2)")
+                    b.Property<string>("NumBarras")
+                        .HasColumnType("text")
                         .HasColumnName("num_barras");
 
                     b.Property<string>("Observaciones")
                         .HasColumnType("text")
                         .HasColumnName("observaciones");
-
-                    b.Property<decimal?>("TalAlivio")
-                        .HasPrecision(10, 2)
-                        .HasColumnType("numeric(10,2)")
-                        .HasColumnName("tal_alivio");
-
-                    b.Property<decimal?>("TalProd")
-                        .HasPrecision(10, 2)
-                        .HasColumnType("numeric(10,2)")
-                        .HasColumnName("tal_prod");
-
-                    b.Property<decimal?>("TalRepaso")
-                        .HasPrecision(10, 2)
-                        .HasColumnType("numeric(10,2)")
-                        .HasColumnName("tal_repaso");
-
-                    b.Property<decimal?>("TalRimados")
-                        .HasPrecision(10, 2)
-                        .HasColumnType("numeric(10,2)")
-                        .HasColumnName("tal_rimados");
 
                     b.Property<string>("TipoLabor")
                         .HasColumnType("text")

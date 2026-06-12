@@ -1,5 +1,7 @@
 BEGIN;
 
+SET LOCAL search_path TO bwqpru6uszd4olgimtbh, public;
+
 UPDATE operacion_tal_horizontal_v2 o
 SET seccion_id = s.id
 FROM secciones s

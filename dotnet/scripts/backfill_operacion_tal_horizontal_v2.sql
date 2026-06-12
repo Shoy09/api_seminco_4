@@ -1,5 +1,7 @@
 BEGIN;
 
+SET LOCAL search_path TO bwqpru6uszd4olgimtbh, public;
+
 CREATE TEMP TABLE tmp_otv2_map (
     legacy_id integer PRIMARY KEY,
     new_id integer NOT NULL

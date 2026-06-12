@@ -1,4 +1,5 @@
 BEGIN;
+SET LOCAL search_path TO bwqpru6uszd4olgimtbh, public;
 CREATE TEMP TABLE tmp_osv2_map (legacy_id integer PRIMARY KEY, new_id integer NOT NULL) ON COMMIT DROP;
 INSERT INTO tmp_osv2_map (legacy_id, new_id) SELECT external_sync_id::integer, id FROM operacion_scalamin_v2 WHERE external_sync_id ~ '^[0-9]+$' ON CONFLICT (legacy_id) DO NOTHING;
 WITH source_rows AS (

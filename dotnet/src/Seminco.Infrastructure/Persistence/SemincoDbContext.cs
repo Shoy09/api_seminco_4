@@ -114,8 +114,8 @@ public sealed class SemincoDbContext(DbContextOptions<SemincoDbContext> options)
             entity.Property(user => user.PasswordHash).HasColumnName("password");
             entity.Property(user => user.Firma).HasColumnName("firma");
             entity.Property(user => user.OperacionesAutorizadas).HasColumnName("operaciones_autorizadas").HasColumnType("jsonb");
-            entity.Property(user => user.CreatedAt).HasColumnName("createdAt");
-            entity.Property(user => user.UpdatedAt).HasColumnName("updatedAt");
+            entity.Property(user => user.CreatedAt).HasColumnName("createdat");
+            entity.Property(user => user.UpdatedAt).HasColumnName("updatedat");
             entity.HasIndex(user => user.CodigoDni).IsUnique().HasDatabaseName("ix_usuarios_codigo_dni");
             entity.HasIndex(user => user.Correo).IsUnique().HasDatabaseName("ix_usuarios_correo").HasFilter("\"correo\" IS NOT NULL");
         });
@@ -151,7 +151,7 @@ public sealed class SemincoDbContext(DbContextOptions<SemincoDbContext> options)
 
         modelBuilder.Entity<TipoPerforacion>(entity =>
         {
-            entity.ToTable("tipoperforacions");
+            entity.ToTable("tipo_perforaciones");
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.Nombre).HasColumnName("nombre");
@@ -1005,7 +1005,7 @@ public sealed class SemincoDbContext(DbContextOptions<SemincoDbContext> options)
         modelBuilder.Entity<OperacionTalLargoRegistroDetalle>(e =>
         {
             e.ToTable("operacion_tal_largo_registro_detalle"); e.HasKey(x => x.RegistroId);
-            e.Property(x => x.RegistroId).HasColumnName("registro_id"); e.Property(x => x.Nivel).HasColumnName("nivel"); e.Property(x => x.TipoLabor).HasColumnName("tipo_labor"); e.Property(x => x.Labor).HasColumnName("labor"); e.Property(x => x.Ala).HasColumnName("ala"); e.Property(x => x.TalProd).HasColumnName("tal_prod").HasPrecision(10, 2); e.Property(x => x.TalRimados).HasColumnName("tal_rimados").HasPrecision(10, 2); e.Property(x => x.TalAlivio).HasColumnName("tal_alivio").HasPrecision(10, 2); e.Property(x => x.TalRepaso).HasColumnName("tal_repaso").HasPrecision(10, 2); e.Property(x => x.LongBarras).HasColumnName("long_barras").HasPrecision(10, 2); e.Property(x => x.NumBarras).HasColumnName("num_barras").HasPrecision(10, 2); e.Property(x => x.TipoPerforacion).HasColumnName("tipo_perforacion"); e.Property(x => x.TipoPerforacionId).HasColumnName("tipo_perforacion_id"); e.Property(x => x.Observaciones).HasColumnName("observaciones");
+            e.Property(x => x.RegistroId).HasColumnName("registro_id"); e.Property(x => x.Nivel).HasColumnName("nivel"); e.Property(x => x.TipoLabor).HasColumnName("tipo_labor"); e.Property(x => x.Labor).HasColumnName("labor"); e.Property(x => x.Ala).HasColumnName("ala"); e.Property(x => x.NTaladrosProduccion).HasColumnName("n_taladros_produccion"); e.Property(x => x.MetrosPerforadosProduccion).HasColumnName("metros_perforados_produccion").HasPrecision(10, 2); e.Property(x => x.NTaladrosRimados).HasColumnName("n_taladros_rimados"); e.Property(x => x.MetrosPerforadosRimados).HasColumnName("metros_perforados_rimados").HasPrecision(10, 2); e.Property(x => x.NTaladrosAlivio).HasColumnName("n_taladros_alivio"); e.Property(x => x.MetrosPerforadosAlivio).HasColumnName("metros_perforados_alivio").HasPrecision(10, 2); e.Property(x => x.NTaladrosRepaso).HasColumnName("n_taladros_repaso"); e.Property(x => x.MetrosPerforadosRepaso).HasColumnName("metros_perforados_repaso").HasPrecision(10, 2); e.Property(x => x.LongBarras).HasColumnName("long_barras"); e.Property(x => x.NumBarras).HasColumnName("num_barras"); e.Property(x => x.TipoPerforacion).HasColumnName("tipo_perforacion"); e.Property(x => x.TipoPerforacionId).HasColumnName("tipo_perforacion_id"); e.Property(x => x.Observaciones).HasColumnName("observaciones");
         });
     }
 

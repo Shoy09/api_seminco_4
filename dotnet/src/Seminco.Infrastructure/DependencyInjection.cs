@@ -100,8 +100,8 @@ public static class DependencyInjection
     }
 
     private static void Copy(DatabaseOptions source, DatabaseOptions target) =>
-        (target.Host, target.Port, target.Name, target.User, target.Password) =
-        (source.Host, source.Port, source.Name, source.User, source.Password);
+        (target.Host, target.Port, target.Name, target.User, target.Password, target.Schema) =
+        (source.Host, source.Port, source.Name, source.User, source.Password, source.Schema);
 
     private static void Copy(JwtOptions source, JwtOptions target) =>
         (target.Secret, target.Issuer, target.Audience, target.ExpirationHours) =

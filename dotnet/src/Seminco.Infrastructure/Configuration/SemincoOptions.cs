@@ -10,9 +10,11 @@ public sealed class DatabaseOptions
     [Required] public string Name { get; set; } = string.Empty;
     [Required] public string User { get; set; } = string.Empty;
     [Required] public string Password { get; set; } = string.Empty;
+    public string Schema { get; set; } = string.Empty;
 
     public string ToConnectionString() =>
-        $"Host={Host};Port={Port};Database={Name};Username={User};Password={Password};";
+        $"Host={Host};Port={Port};Database={Name};Username={User};Password={Password};" +
+        (string.IsNullOrWhiteSpace(Schema) ? "" : $"SearchPath={Schema};");
 }
 
 public sealed class JwtOptions

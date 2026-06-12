@@ -12,8 +12,8 @@ using Seminco.Infrastructure.Persistence;
 namespace Seminco.Infrastructure.Migrations
 {
     [DbContext(typeof(SemincoDbContext))]
-    [Migration("20260611191238_AddOperacionCarguioNormalized")]
-    partial class AddOperacionCarguioNormalized
+    [Migration("20260612071907_RenameLegacyOperacionTablesCase")]
+    partial class RenameLegacyOperacionTablesCase
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -448,7 +448,7 @@ namespace Seminco.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("tipoperforacions", (string)null);
+                    b.ToTable("tipo_perforaciones", (string)null);
                 });
 
             modelBuilder.Entity("Seminco.Domain.Exploraciones.NubeDespacho", b =>
@@ -1407,6 +1407,1187 @@ namespace Seminco.Infrastructure.Migrations
                     b.ToTable("operacion_carguio_registro_detalle", (string)null);
                 });
 
+            modelBuilder.Entity("Seminco.Domain.OperacionesV2.OperacionEmpernador", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("Aprobacion")
+                        .HasColumnType("integer")
+                        .HasColumnName("aprobacion");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("DeviceId")
+                        .HasColumnType("text")
+                        .HasColumnName("device_id");
+
+                    b.Property<int>("Envio")
+                        .HasColumnType("integer")
+                        .HasColumnName("envio");
+
+                    b.Property<int?>("EquipoId")
+                        .HasColumnType("integer")
+                        .HasColumnName("equipo_id");
+
+                    b.Property<string>("EquipoNombre")
+                        .HasColumnType("text")
+                        .HasColumnName("equipo_nombre");
+
+                    b.Property<string>("Estado")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("estado");
+
+                    b.Property<string>("ExternalSyncId")
+                        .HasColumnType("text")
+                        .HasColumnName("external_sync_id");
+
+                    b.Property<DateTime>("Fecha")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("fecha");
+
+                    b.Property<string>("JefeGuardia")
+                        .HasColumnType("text")
+                        .HasColumnName("jefe_guardia");
+
+                    b.Property<string>("NEquipo")
+                        .HasColumnType("text")
+                        .HasColumnName("n_equipo");
+
+                    b.Property<string>("ObservacionesJefe")
+                        .HasColumnType("text")
+                        .HasColumnName("observaciones_jefe");
+
+                    b.Property<string>("ObservacionesJefe2")
+                        .HasColumnType("text")
+                        .HasColumnName("observaciones_jefe2");
+
+                    b.Property<string>("ObservacionesJefe3")
+                        .HasColumnType("text")
+                        .HasColumnName("observaciones_jefe3");
+
+                    b.Property<string>("Operador")
+                        .HasColumnType("text")
+                        .HasColumnName("operador");
+
+                    b.Property<string>("PayloadOriginal")
+                        .HasColumnType("jsonb")
+                        .HasColumnName("payload_original");
+
+                    b.Property<string>("PayloadVersion")
+                        .HasColumnType("text")
+                        .HasColumnName("payload_version");
+
+                    b.Property<int>("Revisado")
+                        .HasColumnType("integer")
+                        .HasColumnName("revisado");
+
+                    b.Property<string>("Seccion")
+                        .HasColumnType("text")
+                        .HasColumnName("seccion");
+
+                    b.Property<int?>("SeccionId")
+                        .HasColumnType("integer")
+                        .HasColumnName("seccion_id");
+
+                    b.Property<bool?>("TipoEquipoDiesel")
+                        .HasColumnType("boolean")
+                        .HasColumnName("tipo_equipo_diesel");
+
+                    b.Property<bool?>("TipoEquipoElectrico")
+                        .HasColumnType("boolean")
+                        .HasColumnName("tipo_equipo_electrico");
+
+                    b.Property<string>("Turno")
+                        .HasColumnType("text")
+                        .HasColumnName("turno");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SeccionId");
+
+                    b.ToTable("operacion_empernador_v2", (string)null);
+                });
+
+            modelBuilder.Entity("Seminco.Domain.OperacionesV2.OperacionEmpernadorChecklistRespuesta", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CategoriaSnapshot")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("categoria_snapshot");
+
+                    b.Property<int?>("ChecklistItemId")
+                        .HasColumnType("integer")
+                        .HasColumnName("checklist_item_id");
+
+                    b.Property<int>("Decision")
+                        .HasColumnType("integer")
+                        .HasColumnName("decision");
+
+                    b.Property<string>("DescripcionSnapshot")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("descripcion_snapshot");
+
+                    b.Property<string>("Observacion")
+                        .HasColumnType("text")
+                        .HasColumnName("observacion");
+
+                    b.Property<int>("OperacionId")
+                        .HasColumnType("integer")
+                        .HasColumnName("operacion_id");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ChecklistItemId");
+
+                    b.HasIndex("OperacionId");
+
+                    b.ToTable("operacion_empernador_checklist", (string)null);
+                });
+
+            modelBuilder.Entity("Seminco.Domain.OperacionesV2.OperacionEmpernadorCondicionEquipo", b =>
+                {
+                    b.Property<int>("OperacionId")
+                        .HasColumnType("integer")
+                        .HasColumnName("operacion_id");
+
+                    b.Property<bool>("AceiteHidraulico")
+                        .HasColumnType("boolean")
+                        .HasColumnName("aceite_hidraulico");
+
+                    b.Property<bool>("AceiteMotor")
+                        .HasColumnType("boolean")
+                        .HasColumnName("aceite_motor");
+
+                    b.Property<bool>("AceiteTransmision")
+                        .HasColumnType("boolean")
+                        .HasColumnName("aceite_transmision");
+
+                    b.Property<string>("Combustible")
+                        .HasColumnType("text")
+                        .HasColumnName("combustible");
+
+                    b.Property<string>("Descripcion")
+                        .HasColumnType("text")
+                        .HasColumnName("descripcion");
+
+                    b.Property<TimeOnly?>("HoraLlenado")
+                        .HasColumnType("time without time zone")
+                        .HasColumnName("hora_llenado");
+
+                    b.Property<string>("Lugar")
+                        .HasColumnType("text")
+                        .HasColumnName("lugar");
+
+                    b.Property<bool>("NoOp")
+                        .HasColumnType("boolean")
+                        .HasColumnName("no_op");
+
+                    b.Property<bool>("Op")
+                        .HasColumnType("boolean")
+                        .HasColumnName("op");
+
+                    b.HasKey("OperacionId");
+
+                    b.ToTable("operacion_empernador_condicion_equipo", (string)null);
+                });
+
+            modelBuilder.Entity("Seminco.Domain.OperacionesV2.OperacionEmpernadorControlLlanta", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("Estado")
+                        .HasColumnType("boolean")
+                        .HasColumnName("estado");
+
+                    b.Property<string>("Observacion")
+                        .HasColumnType("text")
+                        .HasColumnName("observacion");
+
+                    b.Property<int>("OperacionId")
+                        .HasColumnType("integer")
+                        .HasColumnName("operacion_id");
+
+                    b.Property<short>("Posicion")
+                        .HasColumnType("smallint")
+                        .HasColumnName("posicion");
+
+                    b.Property<decimal?>("Presion")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("numeric(10,2)")
+                        .HasColumnName("presion");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OperacionId");
+
+                    b.ToTable("operacion_empernador_control_llanta", (string)null);
+                });
+
+            modelBuilder.Entity("Seminco.Domain.OperacionesV2.OperacionEmpernadorHorometro", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal?>("Final")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("numeric(10,2)")
+                        .HasColumnName("final");
+
+                    b.Property<decimal?>("Inicio")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("numeric(10,2)")
+                        .HasColumnName("inicio");
+
+                    b.Property<bool>("Inop")
+                        .HasColumnType("boolean")
+                        .HasColumnName("inop");
+
+                    b.Property<bool>("Op")
+                        .HasColumnType("boolean")
+                        .HasColumnName("op");
+
+                    b.Property<int>("OperacionId")
+                        .HasColumnType("integer")
+                        .HasColumnName("operacion_id");
+
+                    b.Property<string>("Tipo")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("tipo");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OperacionId", "Tipo")
+                        .IsUnique();
+
+                    b.ToTable("operacion_empernador_horometro", (string)null);
+                });
+
+            modelBuilder.Entity("Seminco.Domain.OperacionesV2.OperacionEmpernadorRegistro", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CodigoEstado")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("codigo_estado");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<int?>("EstadoCatalogoId")
+                        .HasColumnType("integer")
+                        .HasColumnName("estado_catalogo_id");
+
+                    b.Property<string>("EstadoPrincipal")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("estado_principal");
+
+                    b.Property<long?>("ExternalId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("external_id");
+
+                    b.Property<TimeOnly>("HoraFinal")
+                        .HasColumnType("time without time zone")
+                        .HasColumnName("hora_final");
+
+                    b.Property<TimeOnly>("HoraInicio")
+                        .HasColumnType("time without time zone")
+                        .HasColumnName("hora_inicio");
+
+                    b.Property<int>("Numero")
+                        .HasColumnType("integer")
+                        .HasColumnName("numero");
+
+                    b.Property<int>("OperacionId")
+                        .HasColumnType("integer")
+                        .HasColumnName("operacion_id");
+
+                    b.Property<string>("PayloadOperacion")
+                        .HasColumnType("jsonb")
+                        .HasColumnName("payload_operacion");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CodigoEstado");
+
+                    b.HasIndex("EstadoPrincipal");
+
+                    b.HasIndex("OperacionId");
+
+                    b.ToTable("operacion_empernador_registro", (string)null);
+                });
+
+            modelBuilder.Entity("Seminco.Domain.OperacionesV2.OperacionEmpernadorRegistroDetalle", b =>
+                {
+                    b.Property<int>("RegistroId")
+                        .HasColumnType("integer")
+                        .HasColumnName("registro_id");
+
+                    b.Property<string>("Ala")
+                        .HasColumnType("text")
+                        .HasColumnName("ala");
+
+                    b.Property<string>("Labor")
+                        .HasColumnType("text")
+                        .HasColumnName("labor");
+
+                    b.Property<decimal?>("LogPernos")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("numeric(10,2)")
+                        .HasColumnName("log_pernos");
+
+                    b.Property<decimal?>("Mt52Malla")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("numeric(10,2)")
+                        .HasColumnName("mt52_malla");
+
+                    b.Property<decimal?>("NPernosInstalados")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("numeric(10,2)")
+                        .HasColumnName("n_pernos_instalados");
+
+                    b.Property<string>("Nivel")
+                        .HasColumnType("text")
+                        .HasColumnName("nivel");
+
+                    b.Property<string>("Observaciones")
+                        .HasColumnType("text")
+                        .HasColumnName("observaciones");
+
+                    b.Property<string>("SistematicoPuntual")
+                        .HasColumnType("text")
+                        .HasColumnName("sistematico_puntual");
+
+                    b.Property<string>("TipoLabor")
+                        .HasColumnType("text")
+                        .HasColumnName("tipo_labor");
+
+                    b.Property<string>("TipoMalla")
+                        .HasColumnType("text")
+                        .HasColumnName("tipo_malla");
+
+                    b.Property<string>("TipoPernos")
+                        .HasColumnType("text")
+                        .HasColumnName("tipo_pernos");
+
+                    b.HasKey("RegistroId");
+
+                    b.ToTable("operacion_empernador_registro_detalle", (string)null);
+                });
+
+            modelBuilder.Entity("Seminco.Domain.OperacionesV2.OperacionScalamin", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("Aprobacion")
+                        .HasColumnType("integer")
+                        .HasColumnName("aprobacion");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("DeviceId")
+                        .HasColumnType("text")
+                        .HasColumnName("device_id");
+
+                    b.Property<int>("Envio")
+                        .HasColumnType("integer")
+                        .HasColumnName("envio");
+
+                    b.Property<int?>("EquipoId")
+                        .HasColumnType("integer")
+                        .HasColumnName("equipo_id");
+
+                    b.Property<string>("EquipoNombre")
+                        .HasColumnType("text")
+                        .HasColumnName("equipo_nombre");
+
+                    b.Property<string>("Estado")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("estado");
+
+                    b.Property<string>("ExternalSyncId")
+                        .HasColumnType("text")
+                        .HasColumnName("external_sync_id");
+
+                    b.Property<DateTime>("Fecha")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("fecha");
+
+                    b.Property<string>("JefeGuardia")
+                        .HasColumnType("text")
+                        .HasColumnName("jefe_guardia");
+
+                    b.Property<string>("ModeloEquipo")
+                        .HasColumnType("text")
+                        .HasColumnName("modelo_equipo");
+
+                    b.Property<string>("NEquipo")
+                        .HasColumnType("text")
+                        .HasColumnName("n_equipo");
+
+                    b.Property<string>("ObservacionesJefe")
+                        .HasColumnType("text")
+                        .HasColumnName("observaciones_jefe");
+
+                    b.Property<string>("ObservacionesJefe2")
+                        .HasColumnType("text")
+                        .HasColumnName("observaciones_jefe2");
+
+                    b.Property<string>("ObservacionesJefe3")
+                        .HasColumnType("text")
+                        .HasColumnName("observaciones_jefe3");
+
+                    b.Property<string>("Operador")
+                        .HasColumnType("text")
+                        .HasColumnName("operador");
+
+                    b.Property<string>("PayloadOriginal")
+                        .HasColumnType("jsonb")
+                        .HasColumnName("payload_original");
+
+                    b.Property<string>("PayloadVersion")
+                        .HasColumnType("text")
+                        .HasColumnName("payload_version");
+
+                    b.Property<int>("Revisado")
+                        .HasColumnType("integer")
+                        .HasColumnName("revisado");
+
+                    b.Property<string>("Seccion")
+                        .HasColumnType("text")
+                        .HasColumnName("seccion");
+
+                    b.Property<int?>("SeccionId")
+                        .HasColumnType("integer")
+                        .HasColumnName("seccion_id");
+
+                    b.Property<string>("Turno")
+                        .HasColumnType("text")
+                        .HasColumnName("turno");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SeccionId");
+
+                    b.ToTable("operacion_scalamin_v2", (string)null);
+                });
+
+            modelBuilder.Entity("Seminco.Domain.OperacionesV2.OperacionScalaminChecklistRespuesta", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CategoriaSnapshot")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("categoria_snapshot");
+
+                    b.Property<int?>("ChecklistItemId")
+                        .HasColumnType("integer")
+                        .HasColumnName("checklist_item_id");
+
+                    b.Property<int>("Decision")
+                        .HasColumnType("integer")
+                        .HasColumnName("decision");
+
+                    b.Property<string>("DescripcionSnapshot")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("descripcion_snapshot");
+
+                    b.Property<string>("Observacion")
+                        .HasColumnType("text")
+                        .HasColumnName("observacion");
+
+                    b.Property<int>("OperacionId")
+                        .HasColumnType("integer")
+                        .HasColumnName("operacion_id");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ChecklistItemId");
+
+                    b.HasIndex("OperacionId");
+
+                    b.ToTable("operacion_scalamin_checklist", (string)null);
+                });
+
+            modelBuilder.Entity("Seminco.Domain.OperacionesV2.OperacionScalaminCondicionEquipo", b =>
+                {
+                    b.Property<int>("OperacionId")
+                        .HasColumnType("integer")
+                        .HasColumnName("operacion_id");
+
+                    b.Property<bool>("AceiteHidraulico")
+                        .HasColumnType("boolean")
+                        .HasColumnName("aceite_hidraulico");
+
+                    b.Property<bool>("AceiteMotor")
+                        .HasColumnType("boolean")
+                        .HasColumnName("aceite_motor");
+
+                    b.Property<bool>("AceiteTransmision")
+                        .HasColumnType("boolean")
+                        .HasColumnName("aceite_transmision");
+
+                    b.Property<string>("Combustible")
+                        .HasColumnType("text")
+                        .HasColumnName("combustible");
+
+                    b.Property<string>("Descripcion")
+                        .HasColumnType("text")
+                        .HasColumnName("descripcion");
+
+                    b.Property<TimeOnly?>("HoraLlenado")
+                        .HasColumnType("time without time zone")
+                        .HasColumnName("hora_llenado");
+
+                    b.Property<string>("Lugar")
+                        .HasColumnType("text")
+                        .HasColumnName("lugar");
+
+                    b.Property<bool>("NoOp")
+                        .HasColumnType("boolean")
+                        .HasColumnName("no_op");
+
+                    b.Property<bool>("Op")
+                        .HasColumnType("boolean")
+                        .HasColumnName("op");
+
+                    b.HasKey("OperacionId");
+
+                    b.ToTable("operacion_scalamin_condicion_equipo", (string)null);
+                });
+
+            modelBuilder.Entity("Seminco.Domain.OperacionesV2.OperacionScalaminControlLlanta", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("Estado")
+                        .HasColumnType("boolean")
+                        .HasColumnName("estado");
+
+                    b.Property<string>("Observacion")
+                        .HasColumnType("text")
+                        .HasColumnName("observacion");
+
+                    b.Property<int>("OperacionId")
+                        .HasColumnType("integer")
+                        .HasColumnName("operacion_id");
+
+                    b.Property<short>("Posicion")
+                        .HasColumnType("smallint")
+                        .HasColumnName("posicion");
+
+                    b.Property<decimal?>("Presion")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("numeric(10,2)")
+                        .HasColumnName("presion");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OperacionId");
+
+                    b.ToTable("operacion_scalamin_control_llanta", (string)null);
+                });
+
+            modelBuilder.Entity("Seminco.Domain.OperacionesV2.OperacionScalaminHorometro", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal?>("Final")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("numeric(10,2)")
+                        .HasColumnName("final");
+
+                    b.Property<decimal?>("Inicio")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("numeric(10,2)")
+                        .HasColumnName("inicio");
+
+                    b.Property<bool>("Inop")
+                        .HasColumnType("boolean")
+                        .HasColumnName("inop");
+
+                    b.Property<bool>("Op")
+                        .HasColumnType("boolean")
+                        .HasColumnName("op");
+
+                    b.Property<int>("OperacionId")
+                        .HasColumnType("integer")
+                        .HasColumnName("operacion_id");
+
+                    b.Property<string>("Tipo")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("tipo");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OperacionId", "Tipo")
+                        .IsUnique();
+
+                    b.ToTable("operacion_scalamin_horometro", (string)null);
+                });
+
+            modelBuilder.Entity("Seminco.Domain.OperacionesV2.OperacionScalaminRegistro", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CodigoEstado")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("codigo_estado");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<int?>("EstadoCatalogoId")
+                        .HasColumnType("integer")
+                        .HasColumnName("estado_catalogo_id");
+
+                    b.Property<string>("EstadoPrincipal")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("estado_principal");
+
+                    b.Property<long?>("ExternalId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("external_id");
+
+                    b.Property<TimeOnly>("HoraFinal")
+                        .HasColumnType("time without time zone")
+                        .HasColumnName("hora_final");
+
+                    b.Property<TimeOnly>("HoraInicio")
+                        .HasColumnType("time without time zone")
+                        .HasColumnName("hora_inicio");
+
+                    b.Property<int>("Numero")
+                        .HasColumnType("integer")
+                        .HasColumnName("numero");
+
+                    b.Property<int>("OperacionId")
+                        .HasColumnType("integer")
+                        .HasColumnName("operacion_id");
+
+                    b.Property<string>("PayloadOperacion")
+                        .HasColumnType("jsonb")
+                        .HasColumnName("payload_operacion");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CodigoEstado");
+
+                    b.HasIndex("EstadoPrincipal");
+
+                    b.HasIndex("OperacionId");
+
+                    b.ToTable("operacion_scalamin_registro", (string)null);
+                });
+
+            modelBuilder.Entity("Seminco.Domain.OperacionesV2.OperacionScalaminRegistroDetalle", b =>
+                {
+                    b.Property<int>("RegistroId")
+                        .HasColumnType("integer")
+                        .HasColumnName("registro_id");
+
+                    b.Property<string>("Ala")
+                        .HasColumnType("text")
+                        .HasColumnName("ala");
+
+                    b.Property<string>("Labor")
+                        .HasColumnType("text")
+                        .HasColumnName("labor");
+
+                    b.Property<string>("Nivel")
+                        .HasColumnType("text")
+                        .HasColumnName("nivel");
+
+                    b.Property<string>("Observaciones")
+                        .HasColumnType("text")
+                        .HasColumnName("observaciones");
+
+                    b.Property<string>("TipoLabor")
+                        .HasColumnType("text")
+                        .HasColumnName("tipo_labor");
+
+                    b.HasKey("RegistroId");
+
+                    b.ToTable("operacion_scalamin_registro_detalle", (string)null);
+                });
+
+            modelBuilder.Entity("Seminco.Domain.OperacionesV2.OperacionScissor", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("Aprobacion")
+                        .HasColumnType("integer")
+                        .HasColumnName("aprobacion");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("DeviceId")
+                        .HasColumnType("text")
+                        .HasColumnName("device_id");
+
+                    b.Property<int>("Envio")
+                        .HasColumnType("integer")
+                        .HasColumnName("envio");
+
+                    b.Property<int?>("EquipoId")
+                        .HasColumnType("integer")
+                        .HasColumnName("equipo_id");
+
+                    b.Property<string>("EquipoNombre")
+                        .HasColumnType("text")
+                        .HasColumnName("equipo_nombre");
+
+                    b.Property<string>("Estado")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("estado");
+
+                    b.Property<string>("ExternalSyncId")
+                        .HasColumnType("text")
+                        .HasColumnName("external_sync_id");
+
+                    b.Property<DateTime>("Fecha")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("fecha");
+
+                    b.Property<string>("JefeGuardia")
+                        .HasColumnType("text")
+                        .HasColumnName("jefe_guardia");
+
+                    b.Property<string>("ModeloEquipo")
+                        .HasColumnType("text")
+                        .HasColumnName("modelo_equipo");
+
+                    b.Property<string>("NEquipo")
+                        .HasColumnType("text")
+                        .HasColumnName("n_equipo");
+
+                    b.Property<string>("ObservacionesJefe")
+                        .HasColumnType("text")
+                        .HasColumnName("observaciones_jefe");
+
+                    b.Property<string>("ObservacionesJefe2")
+                        .HasColumnType("text")
+                        .HasColumnName("observaciones_jefe2");
+
+                    b.Property<string>("ObservacionesJefe3")
+                        .HasColumnType("text")
+                        .HasColumnName("observaciones_jefe3");
+
+                    b.Property<string>("Operador")
+                        .HasColumnType("text")
+                        .HasColumnName("operador");
+
+                    b.Property<string>("PayloadOriginal")
+                        .HasColumnType("jsonb")
+                        .HasColumnName("payload_original");
+
+                    b.Property<string>("PayloadVersion")
+                        .HasColumnType("text")
+                        .HasColumnName("payload_version");
+
+                    b.Property<int>("Revisado")
+                        .HasColumnType("integer")
+                        .HasColumnName("revisado");
+
+                    b.Property<string>("Seccion")
+                        .HasColumnType("text")
+                        .HasColumnName("seccion");
+
+                    b.Property<int?>("SeccionId")
+                        .HasColumnType("integer")
+                        .HasColumnName("seccion_id");
+
+                    b.Property<string>("Turno")
+                        .HasColumnType("text")
+                        .HasColumnName("turno");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SeccionId");
+
+                    b.ToTable("operacion_scissor_v2", (string)null);
+                });
+
+            modelBuilder.Entity("Seminco.Domain.OperacionesV2.OperacionScissorChecklistRespuesta", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CategoriaSnapshot")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("categoria_snapshot");
+
+                    b.Property<int?>("ChecklistItemId")
+                        .HasColumnType("integer")
+                        .HasColumnName("checklist_item_id");
+
+                    b.Property<int>("Decision")
+                        .HasColumnType("integer")
+                        .HasColumnName("decision");
+
+                    b.Property<string>("DescripcionSnapshot")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("descripcion_snapshot");
+
+                    b.Property<string>("Observacion")
+                        .HasColumnType("text")
+                        .HasColumnName("observacion");
+
+                    b.Property<int>("OperacionId")
+                        .HasColumnType("integer")
+                        .HasColumnName("operacion_id");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ChecklistItemId");
+
+                    b.HasIndex("OperacionId");
+
+                    b.ToTable("operacion_scissor_checklist", (string)null);
+                });
+
+            modelBuilder.Entity("Seminco.Domain.OperacionesV2.OperacionScissorCondicionEquipo", b =>
+                {
+                    b.Property<int>("OperacionId")
+                        .HasColumnType("integer")
+                        .HasColumnName("operacion_id");
+
+                    b.Property<bool>("AceiteHidraulico")
+                        .HasColumnType("boolean")
+                        .HasColumnName("aceite_hidraulico");
+
+                    b.Property<bool>("AceiteMotor")
+                        .HasColumnType("boolean")
+                        .HasColumnName("aceite_motor");
+
+                    b.Property<bool>("AceiteTransmision")
+                        .HasColumnType("boolean")
+                        .HasColumnName("aceite_transmision");
+
+                    b.Property<string>("Combustible")
+                        .HasColumnType("text")
+                        .HasColumnName("combustible");
+
+                    b.Property<string>("Descripcion")
+                        .HasColumnType("text")
+                        .HasColumnName("descripcion");
+
+                    b.Property<TimeOnly?>("HoraLlenado")
+                        .HasColumnType("time without time zone")
+                        .HasColumnName("hora_llenado");
+
+                    b.Property<string>("Lugar")
+                        .HasColumnType("text")
+                        .HasColumnName("lugar");
+
+                    b.Property<bool>("NoOp")
+                        .HasColumnType("boolean")
+                        .HasColumnName("no_op");
+
+                    b.Property<bool>("Op")
+                        .HasColumnType("boolean")
+                        .HasColumnName("op");
+
+                    b.HasKey("OperacionId");
+
+                    b.ToTable("operacion_scissor_condicion_equipo", (string)null);
+                });
+
+            modelBuilder.Entity("Seminco.Domain.OperacionesV2.OperacionScissorControlLlanta", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("Estado")
+                        .HasColumnType("boolean")
+                        .HasColumnName("estado");
+
+                    b.Property<string>("Observacion")
+                        .HasColumnType("text")
+                        .HasColumnName("observacion");
+
+                    b.Property<int>("OperacionId")
+                        .HasColumnType("integer")
+                        .HasColumnName("operacion_id");
+
+                    b.Property<short>("Posicion")
+                        .HasColumnType("smallint")
+                        .HasColumnName("posicion");
+
+                    b.Property<decimal?>("Presion")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("numeric(10,2)")
+                        .HasColumnName("presion");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OperacionId");
+
+                    b.ToTable("operacion_scissor_control_llanta", (string)null);
+                });
+
+            modelBuilder.Entity("Seminco.Domain.OperacionesV2.OperacionScissorHorometro", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal?>("Final")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("numeric(10,2)")
+                        .HasColumnName("final");
+
+                    b.Property<decimal?>("Inicio")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("numeric(10,2)")
+                        .HasColumnName("inicio");
+
+                    b.Property<bool>("Inop")
+                        .HasColumnType("boolean")
+                        .HasColumnName("inop");
+
+                    b.Property<bool>("Op")
+                        .HasColumnType("boolean")
+                        .HasColumnName("op");
+
+                    b.Property<int>("OperacionId")
+                        .HasColumnType("integer")
+                        .HasColumnName("operacion_id");
+
+                    b.Property<string>("Tipo")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("tipo");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OperacionId", "Tipo")
+                        .IsUnique();
+
+                    b.ToTable("operacion_scissor_horometro", (string)null);
+                });
+
+            modelBuilder.Entity("Seminco.Domain.OperacionesV2.OperacionScissorRegistro", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CodigoEstado")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("codigo_estado");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<int?>("EstadoCatalogoId")
+                        .HasColumnType("integer")
+                        .HasColumnName("estado_catalogo_id");
+
+                    b.Property<string>("EstadoPrincipal")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("estado_principal");
+
+                    b.Property<long?>("ExternalId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("external_id");
+
+                    b.Property<TimeOnly>("HoraFinal")
+                        .HasColumnType("time without time zone")
+                        .HasColumnName("hora_final");
+
+                    b.Property<TimeOnly>("HoraInicio")
+                        .HasColumnType("time without time zone")
+                        .HasColumnName("hora_inicio");
+
+                    b.Property<int>("Numero")
+                        .HasColumnType("integer")
+                        .HasColumnName("numero");
+
+                    b.Property<int>("OperacionId")
+                        .HasColumnType("integer")
+                        .HasColumnName("operacion_id");
+
+                    b.Property<string>("PayloadOperacion")
+                        .HasColumnType("jsonb")
+                        .HasColumnName("payload_operacion");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CodigoEstado");
+
+                    b.HasIndex("EstadoPrincipal");
+
+                    b.HasIndex("OperacionId");
+
+                    b.ToTable("operacion_scissor_registro", (string)null);
+                });
+
+            modelBuilder.Entity("Seminco.Domain.OperacionesV2.OperacionScissorRegistroDetalle", b =>
+                {
+                    b.Property<int>("RegistroId")
+                        .HasColumnType("integer")
+                        .HasColumnName("registro_id");
+
+                    b.Property<string>("DestinoAla")
+                        .HasColumnType("text")
+                        .HasColumnName("destino_ala");
+
+                    b.Property<string>("DestinoLabor")
+                        .HasColumnType("text")
+                        .HasColumnName("destino_labor");
+
+                    b.Property<string>("DestinoNivel")
+                        .HasColumnType("text")
+                        .HasColumnName("destino_nivel");
+
+                    b.Property<string>("DestinoTipoLabor")
+                        .HasColumnType("text")
+                        .HasColumnName("destino_tipo_labor");
+
+                    b.Property<string>("Observaciones")
+                        .HasColumnType("text")
+                        .HasColumnName("observaciones");
+
+                    b.Property<string>("OrigenAla")
+                        .HasColumnType("text")
+                        .HasColumnName("origen_ala");
+
+                    b.Property<string>("OrigenLabor")
+                        .HasColumnType("text")
+                        .HasColumnName("origen_labor");
+
+                    b.Property<string>("OrigenNivel")
+                        .HasColumnType("text")
+                        .HasColumnName("origen_nivel");
+
+                    b.Property<string>("OrigenTipoLabor")
+                        .HasColumnType("text")
+                        .HasColumnName("origen_tipo_labor");
+
+                    b.HasKey("RegistroId");
+
+                    b.ToTable("operacion_scissor_registro_detalle", (string)null);
+                });
+
             modelBuilder.Entity("Seminco.Domain.OperacionesV2.OperacionTalHorizontal", b =>
                 {
                     b.Property<int>("Id")
@@ -1821,6 +3002,436 @@ namespace Seminco.Infrastructure.Migrations
                     b.HasKey("RegistroId");
 
                     b.ToTable("operacion_tal_horizontal_registro_detalle", (string)null);
+                });
+
+            modelBuilder.Entity("Seminco.Domain.OperacionesV2.OperacionTalLargo", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("Aprobacion")
+                        .HasColumnType("integer")
+                        .HasColumnName("aprobacion");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("DeviceId")
+                        .HasColumnType("text")
+                        .HasColumnName("device_id");
+
+                    b.Property<int>("Envio")
+                        .HasColumnType("integer")
+                        .HasColumnName("envio");
+
+                    b.Property<int?>("EquipoId")
+                        .HasColumnType("integer")
+                        .HasColumnName("equipo_id");
+
+                    b.Property<string>("EquipoNombre")
+                        .HasColumnType("text")
+                        .HasColumnName("equipo_nombre");
+
+                    b.Property<string>("Estado")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("estado");
+
+                    b.Property<string>("ExternalSyncId")
+                        .HasColumnType("text")
+                        .HasColumnName("external_sync_id");
+
+                    b.Property<DateTime>("Fecha")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("fecha");
+
+                    b.Property<string>("JefeGuardia")
+                        .HasColumnType("text")
+                        .HasColumnName("jefe_guardia");
+
+                    b.Property<string>("ModeloEquipo")
+                        .HasColumnType("text")
+                        .HasColumnName("modelo_equipo");
+
+                    b.Property<string>("NEquipo")
+                        .HasColumnType("text")
+                        .HasColumnName("n_equipo");
+
+                    b.Property<string>("ObservacionesJefe")
+                        .HasColumnType("text")
+                        .HasColumnName("observaciones_jefe");
+
+                    b.Property<string>("ObservacionesJefe2")
+                        .HasColumnType("text")
+                        .HasColumnName("observaciones_jefe2");
+
+                    b.Property<string>("ObservacionesJefe3")
+                        .HasColumnType("text")
+                        .HasColumnName("observaciones_jefe3");
+
+                    b.Property<string>("Operador")
+                        .HasColumnType("text")
+                        .HasColumnName("operador");
+
+                    b.Property<string>("PayloadOriginal")
+                        .HasColumnType("jsonb")
+                        .HasColumnName("payload_original");
+
+                    b.Property<string>("PayloadVersion")
+                        .HasColumnType("text")
+                        .HasColumnName("payload_version");
+
+                    b.Property<int>("Revisado")
+                        .HasColumnType("integer")
+                        .HasColumnName("revisado");
+
+                    b.Property<string>("Seccion")
+                        .HasColumnType("text")
+                        .HasColumnName("seccion");
+
+                    b.Property<int?>("SeccionId")
+                        .HasColumnType("integer")
+                        .HasColumnName("seccion_id");
+
+                    b.Property<string>("Turno")
+                        .HasColumnType("text")
+                        .HasColumnName("turno");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SeccionId");
+
+                    b.ToTable("operacion_tal_largo_v2", (string)null);
+                });
+
+            modelBuilder.Entity("Seminco.Domain.OperacionesV2.OperacionTalLargoChecklistRespuesta", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CategoriaSnapshot")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("categoria_snapshot");
+
+                    b.Property<int?>("ChecklistItemId")
+                        .HasColumnType("integer")
+                        .HasColumnName("checklist_item_id");
+
+                    b.Property<int>("Decision")
+                        .HasColumnType("integer")
+                        .HasColumnName("decision");
+
+                    b.Property<string>("DescripcionSnapshot")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("descripcion_snapshot");
+
+                    b.Property<string>("Observacion")
+                        .HasColumnType("text")
+                        .HasColumnName("observacion");
+
+                    b.Property<int>("OperacionId")
+                        .HasColumnType("integer")
+                        .HasColumnName("operacion_id");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ChecklistItemId");
+
+                    b.HasIndex("OperacionId");
+
+                    b.ToTable("operacion_tal_largo_checklist", (string)null);
+                });
+
+            modelBuilder.Entity("Seminco.Domain.OperacionesV2.OperacionTalLargoCondicionEquipo", b =>
+                {
+                    b.Property<int>("OperacionId")
+                        .HasColumnType("integer")
+                        .HasColumnName("operacion_id");
+
+                    b.Property<bool>("AceiteHidraulico")
+                        .HasColumnType("boolean")
+                        .HasColumnName("aceite_hidraulico");
+
+                    b.Property<bool>("AceiteMotor")
+                        .HasColumnType("boolean")
+                        .HasColumnName("aceite_motor");
+
+                    b.Property<bool>("AceiteTransmision")
+                        .HasColumnType("boolean")
+                        .HasColumnName("aceite_transmision");
+
+                    b.Property<string>("Combustible")
+                        .HasColumnType("text")
+                        .HasColumnName("combustible");
+
+                    b.Property<string>("Descripcion")
+                        .HasColumnType("text")
+                        .HasColumnName("descripcion");
+
+                    b.Property<TimeOnly?>("HoraLlenado")
+                        .HasColumnType("time without time zone")
+                        .HasColumnName("hora_llenado");
+
+                    b.Property<string>("Lugar")
+                        .HasColumnType("text")
+                        .HasColumnName("lugar");
+
+                    b.Property<bool>("NoOp")
+                        .HasColumnType("boolean")
+                        .HasColumnName("no_op");
+
+                    b.Property<bool>("Op")
+                        .HasColumnType("boolean")
+                        .HasColumnName("op");
+
+                    b.HasKey("OperacionId");
+
+                    b.ToTable("operacion_tal_largo_condicion_equipo", (string)null);
+                });
+
+            modelBuilder.Entity("Seminco.Domain.OperacionesV2.OperacionTalLargoControlLlanta", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("Estado")
+                        .HasColumnType("boolean")
+                        .HasColumnName("estado");
+
+                    b.Property<string>("Observacion")
+                        .HasColumnType("text")
+                        .HasColumnName("observacion");
+
+                    b.Property<int>("OperacionId")
+                        .HasColumnType("integer")
+                        .HasColumnName("operacion_id");
+
+                    b.Property<short>("Posicion")
+                        .HasColumnType("smallint")
+                        .HasColumnName("posicion");
+
+                    b.Property<decimal?>("Presion")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("numeric(10,2)")
+                        .HasColumnName("presion");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OperacionId");
+
+                    b.ToTable("operacion_tal_largo_control_llanta", (string)null);
+                });
+
+            modelBuilder.Entity("Seminco.Domain.OperacionesV2.OperacionTalLargoHorometro", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal?>("Final")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("numeric(10,2)")
+                        .HasColumnName("final");
+
+                    b.Property<decimal?>("Inicio")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("numeric(10,2)")
+                        .HasColumnName("inicio");
+
+                    b.Property<bool>("Inop")
+                        .HasColumnType("boolean")
+                        .HasColumnName("inop");
+
+                    b.Property<bool>("Op")
+                        .HasColumnType("boolean")
+                        .HasColumnName("op");
+
+                    b.Property<int>("OperacionId")
+                        .HasColumnType("integer")
+                        .HasColumnName("operacion_id");
+
+                    b.Property<string>("Tipo")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("tipo");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OperacionId", "Tipo")
+                        .IsUnique();
+
+                    b.ToTable("operacion_tal_largo_horometro", (string)null);
+                });
+
+            modelBuilder.Entity("Seminco.Domain.OperacionesV2.OperacionTalLargoRegistro", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CodigoEstado")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("codigo_estado");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<int?>("EstadoCatalogoId")
+                        .HasColumnType("integer")
+                        .HasColumnName("estado_catalogo_id");
+
+                    b.Property<string>("EstadoPrincipal")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("estado_principal");
+
+                    b.Property<long?>("ExternalId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("external_id");
+
+                    b.Property<TimeOnly>("HoraFinal")
+                        .HasColumnType("time without time zone")
+                        .HasColumnName("hora_final");
+
+                    b.Property<TimeOnly>("HoraInicio")
+                        .HasColumnType("time without time zone")
+                        .HasColumnName("hora_inicio");
+
+                    b.Property<int>("Numero")
+                        .HasColumnType("integer")
+                        .HasColumnName("numero");
+
+                    b.Property<int>("OperacionId")
+                        .HasColumnType("integer")
+                        .HasColumnName("operacion_id");
+
+                    b.Property<string>("PayloadOperacion")
+                        .HasColumnType("jsonb")
+                        .HasColumnName("payload_operacion");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CodigoEstado");
+
+                    b.HasIndex("EstadoPrincipal");
+
+                    b.HasIndex("OperacionId");
+
+                    b.ToTable("operacion_tal_largo_registro", (string)null);
+                });
+
+            modelBuilder.Entity("Seminco.Domain.OperacionesV2.OperacionTalLargoRegistroDetalle", b =>
+                {
+                    b.Property<int>("RegistroId")
+                        .HasColumnType("integer")
+                        .HasColumnName("registro_id");
+
+                    b.Property<string>("Ala")
+                        .HasColumnType("text")
+                        .HasColumnName("ala");
+
+                    b.Property<string>("Labor")
+                        .HasColumnType("text")
+                        .HasColumnName("labor");
+
+                    b.Property<string>("LongBarras")
+                        .HasColumnType("text")
+                        .HasColumnName("long_barras");
+
+                    b.Property<decimal?>("MetrosPerforadosAlivio")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("numeric(10,2)")
+                        .HasColumnName("metros_perforados_alivio");
+
+                    b.Property<decimal?>("MetrosPerforadosProduccion")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("numeric(10,2)")
+                        .HasColumnName("metros_perforados_produccion");
+
+                    b.Property<decimal?>("MetrosPerforadosRepaso")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("numeric(10,2)")
+                        .HasColumnName("metros_perforados_repaso");
+
+                    b.Property<decimal?>("MetrosPerforadosRimados")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("numeric(10,2)")
+                        .HasColumnName("metros_perforados_rimados");
+
+                    b.Property<string>("NTaladrosAlivio")
+                        .HasColumnType("text")
+                        .HasColumnName("n_taladros_alivio");
+
+                    b.Property<string>("NTaladrosProduccion")
+                        .HasColumnType("text")
+                        .HasColumnName("n_taladros_produccion");
+
+                    b.Property<string>("NTaladrosRepaso")
+                        .HasColumnType("text")
+                        .HasColumnName("n_taladros_repaso");
+
+                    b.Property<string>("NTaladrosRimados")
+                        .HasColumnType("text")
+                        .HasColumnName("n_taladros_rimados");
+
+                    b.Property<string>("Nivel")
+                        .HasColumnType("text")
+                        .HasColumnName("nivel");
+
+                    b.Property<string>("NumBarras")
+                        .HasColumnType("text")
+                        .HasColumnName("num_barras");
+
+                    b.Property<string>("Observaciones")
+                        .HasColumnType("text")
+                        .HasColumnName("observaciones");
+
+                    b.Property<string>("TipoLabor")
+                        .HasColumnType("text")
+                        .HasColumnName("tipo_labor");
+
+                    b.Property<string>("TipoPerforacion")
+                        .HasColumnType("text")
+                        .HasColumnName("tipo_perforacion");
+
+                    b.Property<int?>("TipoPerforacionId")
+                        .HasColumnType("integer")
+                        .HasColumnName("tipo_perforacion_id");
+
+                    b.HasKey("RegistroId");
+
+                    b.ToTable("operacion_tal_largo_registro_detalle", (string)null);
                 });
 
             modelBuilder.Entity("Seminco.Domain.Planes.FechaPlanMensual", b =>
@@ -3192,6 +4803,255 @@ namespace Seminco.Infrastructure.Migrations
                     b.Navigation("Registro");
                 });
 
+            modelBuilder.Entity("Seminco.Domain.OperacionesV2.OperacionEmpernador", b =>
+                {
+                    b.HasOne("Seminco.Domain.Catalogs.Seccion", "SeccionNav")
+                        .WithMany()
+                        .HasForeignKey("SeccionId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("SeccionNav");
+                });
+
+            modelBuilder.Entity("Seminco.Domain.OperacionesV2.OperacionEmpernadorChecklistRespuesta", b =>
+                {
+                    b.HasOne("Seminco.Domain.Catalogs.CheckListItem", "ChecklistItem")
+                        .WithMany()
+                        .HasForeignKey("ChecklistItemId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("Seminco.Domain.OperacionesV2.OperacionEmpernador", "Operacion")
+                        .WithMany("ChecklistRespuestas")
+                        .HasForeignKey("OperacionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ChecklistItem");
+
+                    b.Navigation("Operacion");
+                });
+
+            modelBuilder.Entity("Seminco.Domain.OperacionesV2.OperacionEmpernadorCondicionEquipo", b =>
+                {
+                    b.HasOne("Seminco.Domain.OperacionesV2.OperacionEmpernador", "Operacion")
+                        .WithOne("CondicionEquipo")
+                        .HasForeignKey("Seminco.Domain.OperacionesV2.OperacionEmpernadorCondicionEquipo", "OperacionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Operacion");
+                });
+
+            modelBuilder.Entity("Seminco.Domain.OperacionesV2.OperacionEmpernadorControlLlanta", b =>
+                {
+                    b.HasOne("Seminco.Domain.OperacionesV2.OperacionEmpernador", "Operacion")
+                        .WithMany("ControlLlantas")
+                        .HasForeignKey("OperacionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Operacion");
+                });
+
+            modelBuilder.Entity("Seminco.Domain.OperacionesV2.OperacionEmpernadorHorometro", b =>
+                {
+                    b.HasOne("Seminco.Domain.OperacionesV2.OperacionEmpernador", "Operacion")
+                        .WithMany("Horometros")
+                        .HasForeignKey("OperacionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Operacion");
+                });
+
+            modelBuilder.Entity("Seminco.Domain.OperacionesV2.OperacionEmpernadorRegistro", b =>
+                {
+                    b.HasOne("Seminco.Domain.OperacionesV2.OperacionEmpernador", "Operacion")
+                        .WithMany("Registros")
+                        .HasForeignKey("OperacionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Operacion");
+                });
+
+            modelBuilder.Entity("Seminco.Domain.OperacionesV2.OperacionEmpernadorRegistroDetalle", b =>
+                {
+                    b.HasOne("Seminco.Domain.OperacionesV2.OperacionEmpernadorRegistro", "Registro")
+                        .WithOne("Detalle")
+                        .HasForeignKey("Seminco.Domain.OperacionesV2.OperacionEmpernadorRegistroDetalle", "RegistroId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Registro");
+                });
+
+            modelBuilder.Entity("Seminco.Domain.OperacionesV2.OperacionScalamin", b =>
+                {
+                    b.HasOne("Seminco.Domain.Catalogs.Seccion", "SeccionNav")
+                        .WithMany()
+                        .HasForeignKey("SeccionId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("SeccionNav");
+                });
+
+            modelBuilder.Entity("Seminco.Domain.OperacionesV2.OperacionScalaminChecklistRespuesta", b =>
+                {
+                    b.HasOne("Seminco.Domain.Catalogs.CheckListItem", "ChecklistItem")
+                        .WithMany()
+                        .HasForeignKey("ChecklistItemId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("Seminco.Domain.OperacionesV2.OperacionScalamin", "Operacion")
+                        .WithMany("ChecklistRespuestas")
+                        .HasForeignKey("OperacionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ChecklistItem");
+
+                    b.Navigation("Operacion");
+                });
+
+            modelBuilder.Entity("Seminco.Domain.OperacionesV2.OperacionScalaminCondicionEquipo", b =>
+                {
+                    b.HasOne("Seminco.Domain.OperacionesV2.OperacionScalamin", "Operacion")
+                        .WithOne("CondicionEquipo")
+                        .HasForeignKey("Seminco.Domain.OperacionesV2.OperacionScalaminCondicionEquipo", "OperacionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Operacion");
+                });
+
+            modelBuilder.Entity("Seminco.Domain.OperacionesV2.OperacionScalaminControlLlanta", b =>
+                {
+                    b.HasOne("Seminco.Domain.OperacionesV2.OperacionScalamin", "Operacion")
+                        .WithMany("ControlLlantas")
+                        .HasForeignKey("OperacionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Operacion");
+                });
+
+            modelBuilder.Entity("Seminco.Domain.OperacionesV2.OperacionScalaminHorometro", b =>
+                {
+                    b.HasOne("Seminco.Domain.OperacionesV2.OperacionScalamin", "Operacion")
+                        .WithMany("Horometros")
+                        .HasForeignKey("OperacionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Operacion");
+                });
+
+            modelBuilder.Entity("Seminco.Domain.OperacionesV2.OperacionScalaminRegistro", b =>
+                {
+                    b.HasOne("Seminco.Domain.OperacionesV2.OperacionScalamin", "Operacion")
+                        .WithMany("Registros")
+                        .HasForeignKey("OperacionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Operacion");
+                });
+
+            modelBuilder.Entity("Seminco.Domain.OperacionesV2.OperacionScalaminRegistroDetalle", b =>
+                {
+                    b.HasOne("Seminco.Domain.OperacionesV2.OperacionScalaminRegistro", "Registro")
+                        .WithOne("Detalle")
+                        .HasForeignKey("Seminco.Domain.OperacionesV2.OperacionScalaminRegistroDetalle", "RegistroId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Registro");
+                });
+
+            modelBuilder.Entity("Seminco.Domain.OperacionesV2.OperacionScissor", b =>
+                {
+                    b.HasOne("Seminco.Domain.Catalogs.Seccion", "SeccionNav")
+                        .WithMany()
+                        .HasForeignKey("SeccionId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("SeccionNav");
+                });
+
+            modelBuilder.Entity("Seminco.Domain.OperacionesV2.OperacionScissorChecklistRespuesta", b =>
+                {
+                    b.HasOne("Seminco.Domain.Catalogs.CheckListItem", "ChecklistItem")
+                        .WithMany()
+                        .HasForeignKey("ChecklistItemId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("Seminco.Domain.OperacionesV2.OperacionScissor", "Operacion")
+                        .WithMany("ChecklistRespuestas")
+                        .HasForeignKey("OperacionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ChecklistItem");
+
+                    b.Navigation("Operacion");
+                });
+
+            modelBuilder.Entity("Seminco.Domain.OperacionesV2.OperacionScissorCondicionEquipo", b =>
+                {
+                    b.HasOne("Seminco.Domain.OperacionesV2.OperacionScissor", "Operacion")
+                        .WithOne("CondicionEquipo")
+                        .HasForeignKey("Seminco.Domain.OperacionesV2.OperacionScissorCondicionEquipo", "OperacionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Operacion");
+                });
+
+            modelBuilder.Entity("Seminco.Domain.OperacionesV2.OperacionScissorControlLlanta", b =>
+                {
+                    b.HasOne("Seminco.Domain.OperacionesV2.OperacionScissor", "Operacion")
+                        .WithMany("ControlLlantas")
+                        .HasForeignKey("OperacionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Operacion");
+                });
+
+            modelBuilder.Entity("Seminco.Domain.OperacionesV2.OperacionScissorHorometro", b =>
+                {
+                    b.HasOne("Seminco.Domain.OperacionesV2.OperacionScissor", "Operacion")
+                        .WithMany("Horometros")
+                        .HasForeignKey("OperacionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Operacion");
+                });
+
+            modelBuilder.Entity("Seminco.Domain.OperacionesV2.OperacionScissorRegistro", b =>
+                {
+                    b.HasOne("Seminco.Domain.OperacionesV2.OperacionScissor", "Operacion")
+                        .WithMany("Registros")
+                        .HasForeignKey("OperacionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Operacion");
+                });
+
+            modelBuilder.Entity("Seminco.Domain.OperacionesV2.OperacionScissorRegistroDetalle", b =>
+                {
+                    b.HasOne("Seminco.Domain.OperacionesV2.OperacionScissorRegistro", "Registro")
+                        .WithOne("Detalle")
+                        .HasForeignKey("Seminco.Domain.OperacionesV2.OperacionScissorRegistroDetalle", "RegistroId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Registro");
+                });
+
             modelBuilder.Entity("Seminco.Domain.OperacionesV2.OperacionTalHorizontal", b =>
                 {
                     b.HasOne("Seminco.Domain.Catalogs.Seccion", "SeccionNav")
@@ -3275,6 +5135,89 @@ namespace Seminco.Infrastructure.Migrations
                     b.Navigation("Registro");
                 });
 
+            modelBuilder.Entity("Seminco.Domain.OperacionesV2.OperacionTalLargo", b =>
+                {
+                    b.HasOne("Seminco.Domain.Catalogs.Seccion", "SeccionNav")
+                        .WithMany()
+                        .HasForeignKey("SeccionId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("SeccionNav");
+                });
+
+            modelBuilder.Entity("Seminco.Domain.OperacionesV2.OperacionTalLargoChecklistRespuesta", b =>
+                {
+                    b.HasOne("Seminco.Domain.Catalogs.CheckListItem", "ChecklistItem")
+                        .WithMany()
+                        .HasForeignKey("ChecklistItemId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("Seminco.Domain.OperacionesV2.OperacionTalLargo", "Operacion")
+                        .WithMany("ChecklistRespuestas")
+                        .HasForeignKey("OperacionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ChecklistItem");
+
+                    b.Navigation("Operacion");
+                });
+
+            modelBuilder.Entity("Seminco.Domain.OperacionesV2.OperacionTalLargoCondicionEquipo", b =>
+                {
+                    b.HasOne("Seminco.Domain.OperacionesV2.OperacionTalLargo", "Operacion")
+                        .WithOne("CondicionEquipo")
+                        .HasForeignKey("Seminco.Domain.OperacionesV2.OperacionTalLargoCondicionEquipo", "OperacionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Operacion");
+                });
+
+            modelBuilder.Entity("Seminco.Domain.OperacionesV2.OperacionTalLargoControlLlanta", b =>
+                {
+                    b.HasOne("Seminco.Domain.OperacionesV2.OperacionTalLargo", "Operacion")
+                        .WithMany("ControlLlantas")
+                        .HasForeignKey("OperacionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Operacion");
+                });
+
+            modelBuilder.Entity("Seminco.Domain.OperacionesV2.OperacionTalLargoHorometro", b =>
+                {
+                    b.HasOne("Seminco.Domain.OperacionesV2.OperacionTalLargo", "Operacion")
+                        .WithMany("Horometros")
+                        .HasForeignKey("OperacionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Operacion");
+                });
+
+            modelBuilder.Entity("Seminco.Domain.OperacionesV2.OperacionTalLargoRegistro", b =>
+                {
+                    b.HasOne("Seminco.Domain.OperacionesV2.OperacionTalLargo", "Operacion")
+                        .WithMany("Registros")
+                        .HasForeignKey("OperacionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Operacion");
+                });
+
+            modelBuilder.Entity("Seminco.Domain.OperacionesV2.OperacionTalLargoRegistroDetalle", b =>
+                {
+                    b.HasOne("Seminco.Domain.OperacionesV2.OperacionTalLargoRegistro", "Registro")
+                        .WithOne("Detalle")
+                        .HasForeignKey("Seminco.Domain.OperacionesV2.OperacionTalLargoRegistroDetalle", "RegistroId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Registro");
+                });
+
             modelBuilder.Entity("Seminco.Domain.Exploraciones.NubeDespacho", b =>
                 {
                     b.Navigation("Detalles");
@@ -3316,6 +5259,60 @@ namespace Seminco.Infrastructure.Migrations
                     b.Navigation("Detalle");
                 });
 
+            modelBuilder.Entity("Seminco.Domain.OperacionesV2.OperacionEmpernador", b =>
+                {
+                    b.Navigation("ChecklistRespuestas");
+
+                    b.Navigation("CondicionEquipo");
+
+                    b.Navigation("ControlLlantas");
+
+                    b.Navigation("Horometros");
+
+                    b.Navigation("Registros");
+                });
+
+            modelBuilder.Entity("Seminco.Domain.OperacionesV2.OperacionEmpernadorRegistro", b =>
+                {
+                    b.Navigation("Detalle");
+                });
+
+            modelBuilder.Entity("Seminco.Domain.OperacionesV2.OperacionScalamin", b =>
+                {
+                    b.Navigation("ChecklistRespuestas");
+
+                    b.Navigation("CondicionEquipo");
+
+                    b.Navigation("ControlLlantas");
+
+                    b.Navigation("Horometros");
+
+                    b.Navigation("Registros");
+                });
+
+            modelBuilder.Entity("Seminco.Domain.OperacionesV2.OperacionScalaminRegistro", b =>
+                {
+                    b.Navigation("Detalle");
+                });
+
+            modelBuilder.Entity("Seminco.Domain.OperacionesV2.OperacionScissor", b =>
+                {
+                    b.Navigation("ChecklistRespuestas");
+
+                    b.Navigation("CondicionEquipo");
+
+                    b.Navigation("ControlLlantas");
+
+                    b.Navigation("Horometros");
+
+                    b.Navigation("Registros");
+                });
+
+            modelBuilder.Entity("Seminco.Domain.OperacionesV2.OperacionScissorRegistro", b =>
+                {
+                    b.Navigation("Detalle");
+                });
+
             modelBuilder.Entity("Seminco.Domain.OperacionesV2.OperacionTalHorizontal", b =>
                 {
                     b.Navigation("ChecklistRespuestas");
@@ -3330,6 +5327,24 @@ namespace Seminco.Infrastructure.Migrations
                 });
 
             modelBuilder.Entity("Seminco.Domain.OperacionesV2.OperacionTalHorizontalRegistro", b =>
+                {
+                    b.Navigation("Detalle");
+                });
+
+            modelBuilder.Entity("Seminco.Domain.OperacionesV2.OperacionTalLargo", b =>
+                {
+                    b.Navigation("ChecklistRespuestas");
+
+                    b.Navigation("CondicionEquipo");
+
+                    b.Navigation("ControlLlantas");
+
+                    b.Navigation("Horometros");
+
+                    b.Navigation("Registros");
+                });
+
+            modelBuilder.Entity("Seminco.Domain.OperacionesV2.OperacionTalLargoRegistro", b =>
                 {
                     b.Navigation("Detalle");
                 });
