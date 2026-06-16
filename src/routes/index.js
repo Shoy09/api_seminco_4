@@ -26,7 +26,7 @@ const ExploUni = require('../routes/api/explisivosUniRouter');
 const NubeDatosTrabajoExploraciones = require('../routes/api/NubeDatosTrabajoExploracionesRoutes');
 const mediHorizontal = require('../routes/api/medicionesHorizontalRoutes');
 const numeroRetardo = require('../routes/api/numero_retardosRoutes');
-
+const pdfOperacion = require('../routes/api/pdfRoutes');
 
 router.use('/usuarios', usuariosRoutes);  
 router.use('/auth', authRoutes);  
@@ -52,5 +52,5 @@ router.use('/Explosivos', Explosivo);
 router.use('/NubeDatosExploraciones', NubeDatosTrabajoExploraciones);  
 router.use('/medicion-tal-horizontal', mediHorizontal); 
 router.use('/n-retardos', numeroRetardo); 
-
+router.use('/pdf-operacion', pdfOperacion); 
 module.exports = router;

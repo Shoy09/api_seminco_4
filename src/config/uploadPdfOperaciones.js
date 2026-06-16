@@ -5,7 +5,7 @@ const cloudinary = require('../config/cloudinary');
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
-    folder: 'pdf-operaciones',
+    folder: 'Alpayana/Operaciones',
     resource_type: 'raw', // <-- CAMBIAR de 'auto' a 'raw'
     format: 'pdf',
     public_id: (req, file) => {
