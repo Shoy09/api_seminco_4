@@ -1,0 +1,114 @@
+BEGIN;
+
+SET LOCAL search_path TO bwqpru6uszd4olgimtbh, public;
+
+CREATE TEMP TABLE tmp_otlv2_map (legacy_id integer PRIMARY KEY, new_id integer NOT NULL) ON COMMIT DROP;
+
+INSERT INTO tmp_otlv2_map (legacy_id, new_id)
+SELECT external_sync_id::integer, id
+FROM operacion_tal_largo_v2
+WHERE external_sync_id ~ '^[0-9]+$'
+ON CONFLICT (legacy_id) DO NOTHING;
+
+WITH source_rows AS (
+    SELECT o.id AS legacy_id, s.id AS seccion_id,
+           CASE
+               WHEN o.fecha IS NULL OR btrim(o.fecha) = '' THEN now()
+               WHEN o.fecha ~ '^\d{4}-\d{2}-\d{2}$' THEN ((o.fecha || ' 00:00:00')::timestamp AT TIME ZONE 'UTC')
+               WHEN o.fecha ~ '^\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}(:\d{2})?$' THEN (o.fecha::timestamp AT TIME ZONE 'UTC')
+               WHEN o.fecha ~ '^\d{2}/\d{2}/\d{4}$' THEN (to_timestamp(o.fecha, 'DD/MM/YYYY') AT TIME ZONE 'UTC')
+               ELSE now()
+           END AS fecha,
+           o.turno, o.operador, o.jefe_guardia, o.equipo AS equipo_nombre, o.n_equipo, o.seccion, o.modelo_equipo,
+           COALESCE(o.estado, 'activo') AS estado, COALESCE(o.envio, 0) AS envio, COALESCE(o.revisado, 0) AS revisado, COALESCE(o.aprobacion, 0) AS aprobacion,
+           o.observaciones_jefe::text AS observaciones_jefe, o.observaciones_jefe2::text AS observaciones_jefe2, o.observaciones_jefe3::text AS observaciones_jefe3,
+           jsonb_build_object('registros', COALESCE(NULLIF(o.registros, ''), '[]')::jsonb, 'horometros', COALESCE(NULLIF(o.horometros, ''), '{}')::jsonb, 'condiciones_equipo', COALESCE(NULLIF(o.condiciones_equipo, ''), '{}')::jsonb, 'check_list', COALESCE(NULLIF(o.check_list, ''), '[]')::jsonb, 'control_llantas', COALESCE(NULLIF(o.control_llantas, ''), '{}')::jsonb)::jsonb AS payload_original,
+           now() AS created_at, now() AS updated_at
+    FROM "Operacion_tal_largo" o
+    LEFT JOIN secciones s ON o.seccion IS NOT NULL AND btrim(o.seccion) <> '' AND ((position(',' in o.seccion) > 0 AND s.proceso = TRIM(SPLIT_PART(o.seccion, ',', 1)) AND s.nombre = TRIM(SPLIT_PART(o.seccion, ',', 2))) OR (position(',' in o.seccion) = 0 AND s.proceso = 'PERFORACIÓN TALADROS LARGOS' AND s.nombre = btrim(o.seccion)))
+    WHERE NOT EXISTS (SELECT 1 FROM tmp_otlv2_map m WHERE m.legacy_id = o.id)
+), inserted AS (
+    INSERT INTO operacion_tal_largo_v2 (fecha, turno, operador, jefe_guardia, equipo_nombre, n_equipo, seccion, seccion_id, modelo_equipo, estado, envio, revisado, aprobacion, observaciones_jefe, observaciones_jefe2, observaciones_jefe3, payload_original, payload_version, external_sync_id, created_at, updated_at)
+    SELECT fecha, turno, operador, jefe_guardia, equipo_nombre, n_equipo, seccion, seccion_id, modelo_equipo, estado, envio, revisado, aprobacion, observaciones_jefe, observaciones_jefe2, observaciones_jefe3, payload_original, 'legacy-v1', legacy_id::text, created_at, updated_at FROM source_rows
+    RETURNING id, external_sync_id
+)
+INSERT INTO tmp_otlv2_map (legacy_id, new_id)
+SELECT external_sync_id::integer, id FROM inserted ON CONFLICT (legacy_id) DO NOTHING;
+
+DELETE FROM operacion_tal_largo_checklist WHERE operacion_id IN (SELECT new_id FROM tmp_otlv2_map);
+DELETE FROM operacion_tal_largo_control_llanta WHERE operacion_id IN (SELECT new_id FROM tmp_otlv2_map);
+DELETE FROM operacion_tal_largo_horometro WHERE operacion_id IN (SELECT new_id FROM tmp_otlv2_map);
+DELETE FROM operacion_tal_largo_condicion_equipo WHERE operacion_id IN (SELECT new_id FROM tmp_otlv2_map);
+DELETE FROM operacion_tal_largo_registro_detalle WHERE registro_id IN (SELECT id FROM operacion_tal_largo_registro WHERE operacion_id IN (SELECT new_id FROM tmp_otlv2_map));
+DELETE FROM operacion_tal_largo_registro WHERE operacion_id IN (SELECT new_id FROM tmp_otlv2_map);
+
+INSERT INTO operacion_tal_largo_horometro (operacion_id, tipo, inicio, final, op, inop)
+SELECT m.new_id, lower(h.key), NULLIF(h.value->>'inicio', '')::numeric(10,2), NULLIF(h.value->>'final', '')::numeric(10,2), COALESCE((h.value->>'op')::boolean, false), COALESCE((h.value->>'inop')::boolean, false)
+FROM "Operacion_tal_largo" o JOIN tmp_otlv2_map m ON m.legacy_id = o.id CROSS JOIN LATERAL jsonb_each(COALESCE(NULLIF(o.horometros, ''), '{}')::jsonb) h;
+
+INSERT INTO operacion_tal_largo_condicion_equipo (operacion_id, op, no_op, lugar, descripcion, aceite_motor, aceite_hidraulico, aceite_transmision, combustible, hora_llenado)
+SELECT m.new_id, COALESCE((c.payload->>'op')::boolean, false), COALESCE((c.payload->>'noOp')::boolean, false), NULLIF(c.payload->>'lugar', ''), NULLIF(c.payload->>'descripcion', ''), COALESCE((c.payload->>'aceiteMotor')::boolean, false), COALESCE((c.payload->>'aceiteHidraulico')::boolean, false), COALESCE((c.payload->>'aceiteTransmision')::boolean, false), NULLIF(c.payload->>'combustible', ''), CASE WHEN NULLIF(c.payload->>'horaLlenado', '') ~ '^\d{1,2}:\d{2}(:\d{2})?$' THEN (c.payload->>'horaLlenado')::time ELSE NULL END
+FROM "Operacion_tal_largo" o JOIN tmp_otlv2_map m ON m.legacy_id = o.id CROSS JOIN LATERAL (SELECT COALESCE(NULLIF(o.condiciones_equipo, ''), '{}')::jsonb AS payload) c WHERE c.payload <> '{}'::jsonb;
+
+INSERT INTO operacion_tal_largo_checklist (operacion_id, checklist_item_id, categoria_snapshot, descripcion_snapshot, decision, observacion)
+SELECT m.new_id, c.id, COALESCE(item->>'categoria', ''), COALESCE(item->>'descripcion', ''), COALESCE(NULLIF(item->>'decision', '')::integer, 0), NULLIF(item->>'observacion', '')
+FROM "Operacion_tal_largo" o JOIN tmp_otlv2_map m ON m.legacy_id = o.id CROSS JOIN LATERAL jsonb_array_elements(COALESCE(NULLIF(o.check_list, ''), '[]')::jsonb) item
+LEFT JOIN checklist_items c ON lower(trim(c.proceso)) = lower(trim('PERFORACIÓN TALADROS LARGOS')) AND lower(trim(c.categoria)) = lower(trim(COALESCE(item->>'categoria', ''))) AND lower(trim(c.nombre)) = lower(trim(COALESCE(item->>'descripcion', '')));
+
+INSERT INTO operacion_tal_largo_control_llanta (operacion_id, posicion, estado, presion, observacion)
+SELECT m.new_id, x.posicion, x.estado, NULL, NULL
+FROM "Operacion_tal_largo" o JOIN tmp_otlv2_map m ON m.legacy_id = o.id CROSS JOIN LATERAL (VALUES (1::smallint, COALESCE((COALESCE(NULLIF(o.control_llantas, ''), '{}')::jsonb->>'numero1')::boolean, false)), (2::smallint, COALESCE((COALESCE(NULLIF(o.control_llantas, ''), '{}')::jsonb->>'numero2')::boolean, false)), (3::smallint, COALESCE((COALESCE(NULLIF(o.control_llantas, ''), '{}')::jsonb->>'numero3')::boolean, false)), (4::smallint, COALESCE((COALESCE(NULLIF(o.control_llantas, ''), '{}')::jsonb->>'numero4')::boolean, false))) AS x(posicion, estado);
+
+WITH registros_source AS (
+    SELECT m.new_id AS operacion_id, t.item AS registro, t.ordinality AS source_ordinal, now() AS ts
+    FROM "Operacion_tal_largo" o JOIN tmp_otlv2_map m ON m.legacy_id = o.id
+    CROSS JOIN LATERAL jsonb_array_elements(COALESCE(NULLIF(o.registros, ''), '[]')::jsonb) WITH ORDINALITY AS t(item, ordinality)
+), registros_inserted AS (
+    INSERT INTO operacion_tal_largo_registro (operacion_id, external_id, numero, estado_principal, codigo_estado, estado_catalogo_id, hora_inicio, hora_final, payload_operacion, created_at, updated_at)
+    SELECT s.operacion_id, CASE WHEN COALESCE(s.registro->>'id', '') ~ '^[0-9]+$' THEN (s.registro->>'id')::bigint ELSE NULL END, COALESCE(NULLIF(s.registro->>'numero', '')::integer, 0), COALESCE(s.registro->>'estado', ''), COALESCE(s.registro->>'codigo', ''), e.id, CASE WHEN COALESCE(s.registro->>'hora_inicio', '') ~ '^\d{1,2}:\d{2}(:\d{2})?$' THEN (s.registro->>'hora_inicio')::time ELSE '00:00'::time END, CASE WHEN COALESCE(s.registro->>'hora_final', '') ~ '^\d{1,2}:\d{2}(:\d{2})?$' THEN (s.registro->>'hora_final')::time ELSE '00:00'::time END, (s.registro->'operacion')::jsonb, s.ts, s.ts
+    FROM registros_source s LEFT JOIN estados e ON e.proceso = 'PERFORACIÓN TALADROS LARGOS' AND lower(trim(e.codigo)) = lower(trim(COALESCE(s.registro->>'codigo', '')))
+    ORDER BY s.operacion_id, s.source_ordinal RETURNING id, operacion_id, estado_principal
+), source_with_ordinal AS (
+    SELECT m.new_id AS operacion_id,
+           t.item->'operacion' AS op,
+           t.ordinality AS source_ordinal,
+           upper(trim(COALESCE(t.item->>'estado', ''))) AS estado_principal,
+           COALESCE(NULLIF(t.item->'operacion'->>'tipo_perforacion_id', '')::integer, tp.id) AS tipo_perforacion_id
+    FROM "Operacion_tal_largo" o
+    JOIN tmp_otlv2_map m ON m.legacy_id = o.id
+    CROSS JOIN LATERAL jsonb_array_elements(COALESCE(NULLIF(o.registros, ''), '[]')::jsonb) WITH ORDINALITY AS t(item, ordinality)
+    LEFT JOIN tipo_perforaciones tp ON lower(trim(tp.nombre)) = lower(trim(t.item->'operacion'->>'tipo_perforacion'))
+), inserted_with_ordinal AS (
+    SELECT r.id,
+           r.operacion_id,
+           row_number() OVER (PARTITION BY r.operacion_id ORDER BY r.id) AS source_ordinal,
+           upper(trim(COALESCE(r.estado_principal, ''))) AS estado_principal
+    FROM registros_inserted r
+)
+INSERT INTO operacion_tal_largo_registro_detalle (registro_id, nivel, tipo_labor, labor, ala, n_taladros_produccion, metros_perforados_produccion, n_taladros_rimados, metros_perforados_rimados, n_taladros_alivio, metros_perforados_alivio, n_taladros_repaso, metros_perforados_repaso, long_barras, num_barras, tipo_perforacion, tipo_perforacion_id, observaciones)
+SELECT DISTINCT ON (ri.id)
+       ri.id,
+       NULLIF(src.op->>'nivel', ''),
+       NULLIF(src.op->>'tipo_labor', ''),
+       NULLIF(src.op->>'labor', ''),
+       NULLIF(src.op->>'ala', ''),
+       COALESCE(NULLIF(src.op->>'n_taladros_produccion', ''), NULLIF(src.op->>'tal_prod', '')),
+       COALESCE(NULLIF(src.op->>'metros_perforados_produccion', '')::numeric(10,2), NULLIF(src.op->>'tal_prod', '')::numeric(10,2)),
+       COALESCE(NULLIF(src.op->>'n_taladros_rimados', ''), NULLIF(src.op->>'tal_rimados', '')),
+       COALESCE(NULLIF(src.op->>'metros_perforados_rimados', '')::numeric(10,2), NULLIF(src.op->>'tal_rimados', '')::numeric(10,2)),
+       COALESCE(NULLIF(src.op->>'n_taladros_alivio', ''), NULLIF(src.op->>'tal_alivio', '')),
+       COALESCE(NULLIF(src.op->>'metros_perforados_alivio', '')::numeric(10,2), NULLIF(src.op->>'tal_alivio', '')::numeric(10,2)),
+       COALESCE(NULLIF(src.op->>'n_taladros_repaso', ''), NULLIF(src.op->>'tal_repaso', '')),
+       COALESCE(NULLIF(src.op->>'metros_perforados_repaso', '')::numeric(10,2), NULLIF(src.op->>'tal_repaso', '')::numeric(10,2)),
+       NULLIF(src.op->>'long_barras', ''),
+       NULLIF(src.op->>'num_barras', ''),
+       NULLIF(src.op->>'tipo_perforacion', ''),
+       src.tipo_perforacion_id,
+       NULLIF(src.op->>'observaciones', '')
+FROM source_with_ordinal src
+JOIN inserted_with_ordinal ri ON ri.operacion_id = src.operacion_id AND ri.source_ordinal = src.source_ordinal
+WHERE src.estado_principal = 'OPERATIVO' AND ri.estado_principal = 'OPERATIVO'
+ORDER BY ri.id
+ON CONFLICT (registro_id) DO UPDATE SET nivel = EXCLUDED.nivel, tipo_labor = EXCLUDED.tipo_labor, labor = EXCLUDED.labor, ala = EXCLUDED.ala, n_taladros_produccion = EXCLUDED.n_taladros_produccion, metros_perforados_produccion = EXCLUDED.metros_perforados_produccion, n_taladros_rimados = EXCLUDED.n_taladros_rimados, metros_perforados_rimados = EXCLUDED.metros_perforados_rimados, n_taladros_alivio = EXCLUDED.n_taladros_alivio, metros_perforados_alivio = EXCLUDED.metros_perforados_alivio, n_taladros_repaso = EXCLUDED.n_taladros_repaso, metros_perforados_repaso = EXCLUDED.metros_perforados_repaso, long_barras = EXCLUDED.long_barras, num_barras = EXCLUDED.num_barras, tipo_perforacion = EXCLUDED.tipo_perforacion, tipo_perforacion_id = EXCLUDED.tipo_perforacion_id, observaciones = EXCLUDED.observaciones;
+
+COMMIT;
